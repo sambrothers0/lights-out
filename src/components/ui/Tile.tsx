@@ -2,18 +2,24 @@ import React from 'react';
 
 interface TileProps {
   state: "on" | "off";
-  number?: number;
-  children?: React.ReactNode;
+  number: number;
   className?: string;
+  onClick: () => void;
 }
 
-export const Tile: React.FC<TileProps> = ({ number, children, className = '' }) => {
+export const Tile: React.FC<TileProps> = ({ state, number, className = '', onClick }) => {
+  const stateClassName = state === 'on'
+    ? 'bg-amber-100 text-amber-950 border-amber-200'
+    : 'bg-stone-700 text-stone-100 border-stone-800';
+
   return (
-    <div
-      className={`flex w-full aspect-square items-center justify-center rounded-lg border border-stone-900/50 bg-white text-xl font-semibold text-stone-800 shadow-sm transition-shadow hover:shadow-md ${className}`}
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex w-full aspect-square items-center justify-center rounded-sm border text-xl font-semibold shadow-sm transition-shadow hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-900 focus-visible:ring-offset-2 ${stateClassName} ${className}`}
     >
-      {children ?? number}
-    </div>
+      {number}
+    </button>
   );
 };
 

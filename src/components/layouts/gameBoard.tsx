@@ -1,4 +1,5 @@
 import Tile from "@/components/ui/Tile";
+import { useState } from "react";
 // import Model from "@/model/Model";
 
 const BOARD_SIZE = 5;
@@ -11,6 +12,8 @@ interface TileData {
   col: number;
 }
 
+type TileState = Record<number, "on" | "off">;
+
 const TILES: TileData[] = ROWS.flatMap((row) =>
   COLS.map((col) => ({
     number: row * BOARD_SIZE + col + 1,
@@ -19,15 +22,30 @@ const TILES: TileData[] = ROWS.flatMap((row) =>
   }))
 );
 
-interface GameBoardProps {
-  className?: string;
-}
+export const GameBoard = () => {
+  const [tileStates, setTileStates] = useState<TileState>(() =>
+    TILES.reduce<TileState>((states, tile) => {
+      states[tile.number] = 'off';
+      return states;
+    }, {})
+  );
 
-export const GameBoard = ({ className = '' }: GameBoardProps) => {
+  const toggleState = (tileNumber: number) => {
+    setTileStates((currentStates) => ({
+      ...currentStates,
+      [tileNumber]: currentStates[tileNumber] === 'on' ? 'off' : 'on',
+    }));
+  };
+
   return (
-    <div className={`grid grid-cols-5 gap-4 w-full h-full ${className}`}>
+    <div className={`grid grid-cols-5 gap-1 w-full h-full`}>
       {TILES.map((tile) => (
-        <Tile key={tile.number} state="off" number={tile.number}/>
+        <Tile
+          key={tile.number}
+          state={tileStates[tile.number]}
+          number={tile.number}
+          onClick={() => toggleState(tile.number)}
+        />
       ))}
     </div>
   );
