@@ -20,13 +20,13 @@ const startingTiles: TileData[] = ROW_NUMS.flatMap((row) =>
   COL_NUMS.map((col) => ({
     index: row * BOARD_SIZE + col,
     label: row * BOARD_SIZE + col + 1,
-    state: Math.random() < 0.5, // random starting logic could be implemented here
+    state: Math.random() < 0.5,
     row,
     col,
   }))
 );
 
-export const GameBoard = () => {
+export const GameBoard = ({ onBoardChange }: { onBoardChange: () => void }) => {
   const findAffectedIndices = (index: number): Set<number> => {
     const affectedIndices = new Set<number>();
     affectedIndices.add(index)
@@ -50,7 +50,6 @@ export const GameBoard = () => {
   };
 
   const [tiles, setTiles] = useState<TileData[]>(startingTiles);
-
   const toggleState = (index: number) => {
     const affectedIndices = findAffectedIndices(index);
     setTiles(prev => prev.map(tile => {
@@ -68,7 +67,11 @@ export const GameBoard = () => {
           key={tile.index}
           number={tile.label}
           state={tile.state}
-          onClick={() => toggleState(tile.index)}
+          onClick={() => {
+              toggleState(tile.index);
+              onBoardChange();
+            }
+          }
         />
       ))}
     </div>
