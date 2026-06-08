@@ -20,7 +20,7 @@ const startingTiles: TileData[] = ROW_NUMS.flatMap((row) =>
   COL_NUMS.map((col) => ({
     index: row * BOARD_SIZE + col,
     label: row * BOARD_SIZE + col + 1,
-    state: false, // random starting logic could be implemented here
+    state: Math.random() < 0.5, // random starting logic could be implemented here
     row,
     col,
   }))
