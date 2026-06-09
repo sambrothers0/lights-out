@@ -80,11 +80,6 @@ export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount:
     }
   }, [hasWon, winGame]);
 
-   const autoWin = () => {
-    const newTiles = tiles.map(tile => ({ ...tile, state: false }));
-    setTiles(newTiles);
-  };
-
   return (
     <>
     {/* <div className="mb-2">

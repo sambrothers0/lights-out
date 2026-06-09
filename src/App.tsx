@@ -17,7 +17,7 @@ function App() {
 
   return (
     <main className="relative min-h-screen overflow-hidden px-6 py-12 text-stone-900 sm:px-10">
-      <p className="mx-auto mb-10 text-center w-fit rounded-xl border border-stone-300/15 bg-stone-700 px-4 py-3 text-3xl font-semibold uppercase tracking-[0.18em] text-amber-200">
+      <p className="mx-auto mb-10 text-center w-fit rounded-sm border border-stone-300/15 bg-stone-700 px-4 py-3 text-3xl font-semibold uppercase tracking-[0.18em] text-amber-200">
         Lights Out
       </p>
 
@@ -60,7 +60,7 @@ function App() {
         >
         {"Difficulty"}
       </button> 
-      
+
       <div className="mx-auto my-12 h-px w-[80vmin] bg-stone-700" />
       
       <p className="mx-auto max-w-2xl my-4 text-center text-stone-300 sm:text-lg">

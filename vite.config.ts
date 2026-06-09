@@ -7,6 +7,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/lights-out/',
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
