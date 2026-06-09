@@ -6,6 +6,7 @@ interface TileData {
   index: number;
   label: number;
   state: boolean;
+  highlighted: boolean;
   row: number;
   col: number;
 }
@@ -21,6 +22,7 @@ const COL_NUMS = Array.from({ length: BOARD_SIZE }, (_, i) => i);
 //     index: row * BOARD_SIZE + col,
 //     label: row * BOARD_SIZE + col + 1,
 //     state: Math.random() < 0.5,
+//     hovered: false,
 //     row,
 //     col,
 //   }))
@@ -32,6 +34,7 @@ const startingTiles: TileData[] = ROW_NUMS.flatMap((row) =>
     index: row * BOARD_SIZE + col,
     label: row * BOARD_SIZE + col + 1,
     state: ([8, 12, 13, 14, 18].includes(row * BOARD_SIZE + col + 1)) ? true : false,
+    highlighted: false,
     row,
     col,
   }))
@@ -61,13 +64,37 @@ export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount:
     return affectedIndices;
   };
 
+  const mouseEnterHandler = (index: number) => {
+    const affectedIndices = findAffectedIndices(index);
+    const newTiles = tiles.map(tile => {
+      if (affectedIndices.has(tile.index)) {
+        return { ...tile, highlighted: true };
+      }
+      return tile;
+    });
+    setTiles(newTiles);
+  }
+
+  const mouseLeaveHandler = (index: number) => {
+    const affectedIndices = findAffectedIndices(index);
+    const newTiles = tiles.map(tile => {
+      if (affectedIndices.has(tile.index)) {
+        return { ...tile, highlighted: false };
+      }
+      return tile;
+    });
+    setTiles(newTiles);
+  }
+
   const [tiles, setTiles] = useState<TileData[]>(startingTiles);
   const toggleState = (index: number) => {
     const affectedIndices = findAffectedIndices(index);
     const newTiles = tiles.map(tile => {
       if (affectedIndices.has(tile.index)) {
+
         return { ...tile, state: !tile.state };
       }
+
       return tile;
     });
     setTiles(newTiles);
@@ -97,13 +124,15 @@ export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount:
         <Tile
           key={tile.index}
           state={tile.state}
+          highlighted={tile.highlighted}
+          onMouseEnter={() => {mouseEnterHandler(tile.index)}}
+          onMouseLeave={() => {mouseLeaveHandler(tile.index)}}
           onClick={() => {
             if (!hasWon) {
               toggleState(tile.index);
               incrementMoveCount();
             }
-            }
-          }
+          }}
         />
       ))}
     </div>

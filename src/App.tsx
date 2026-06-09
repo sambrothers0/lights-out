@@ -63,8 +63,10 @@ function App() {
 
       <div className="mx-auto my-12 h-px w-[80vmin] bg-stone-700" />
       
-      <p className="mx-auto max-w-2xl my-4 text-center text-stone-300 sm:text-lg">
+      <p className="mx-auto max-w-2xl my-4 text-center text-stone-300 sm:text-md">
         <a href="https://en.wikipedia.org/wiki/Lights_Out_(game)" className="underline underline-offset-4">Game Info</a>
+        <br />
+        <a href="https://github.com/sambrothers0/lights-out" className="underline underline-offset-4">Code</a>
         <br />
         <a href="https://www.youtube.com/watch?v=ffCWa3Cppk4" className="underline underline-offset-4">Solution</a>
       </p>
