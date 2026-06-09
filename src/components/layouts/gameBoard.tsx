@@ -87,14 +87,14 @@ export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount:
 
   return (
     <>
-    <div className="mb-2">
+    {/* <div className="mb-2">
         <button
           onClick={() => {autoWin(); incrementMoveCount(); }}
           className="px-3 py-1 bg-green-600 text-white rounded"
         >
           Click to win
         </button>
-      </div>
+      </div> */}
 
 
     <div className={`grid grid-cols-5 gap-1 w-full h-full`}>
