@@ -2,14 +2,14 @@ import React from 'react';
 
 interface TileProps {
   state: boolean;
-  number: number;
+  number?: number;
   className?: string;
   onClick: () => void;
 }
 
 export const Tile: React.FC<TileProps> = ({ state, number, className = '', onClick }) => {
   const stateClassName = state
-    ? 'bg-amber-100 text-amber-950 border-amber-200'
+    ? 'bg-amber-200 text-amber-950 border-amber-200'
     : 'bg-stone-700 text-stone-100 border-stone-800';
 
   return (

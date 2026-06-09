@@ -17,7 +17,7 @@ function App() {
 
   return (
     <main className="relative min-h-screen overflow-hidden px-6 py-12 text-stone-900 sm:px-10">
-      <p className="mx-auto w-fit rounded-full border border-stone-900/15 bg-gray-200 px-3 py-1 text-lg font-semibold uppercase tracking-[0.18em] text-stone-700">
+      <p className="mx-auto w-fit rounded-xl border border-stone-300/15 bg-stone-700 px-3 py-1 text-3xl font-semibold uppercase tracking-[0.18em] text-stone-200">
         Lights Out
       </p>
 
@@ -27,7 +27,7 @@ function App() {
             <p className="text-5xl font-black uppercase tracking-[0.22em] text-amber-300 sm:text-7xl">
               You Win
             </p>
-            <p className="mt-6 text-xl text-stone-200 sm:text-2xl">
+            <p className="mt-6 text-xl text-stone-600 sm:text-2xl">
               It took you {moveCount} tries.
             </p>
             <button
@@ -41,15 +41,15 @@ function App() {
         )}
       </div>
 
-      <section className="relative mx-auto flex h-[70vmin] w-[70vmin] items-center justify-center rounded-3xl border border-stone-900/10 bg-white/70 p-8 backdrop-blur-md sm:p-10">
+      <section className="relative mx-auto flex h-[70vmin] w-[70vmin] items-center justify-center p-8 sm:p-10">
         <GameBoard incrementMoveCount={incrementMoveCount} winGame={winGame} key={resetKey}/>
       </section>
 
-      <p className="mt-4 text-center text-sm font-medium uppercase tracking-[0.2em] text-stone-600">
+      <p className="mt-4 pb-4 text-center text-sm font-medium uppercase tracking-[0.2em] text-stone-400">
         Move Count: {moveCount}
       </p>
 
-        <p className="mx-auto max-w-2xl text-center text-base text-stone-700 sm:text-lg">
+        <p className="mx-auto max-w-2xl text-center text-base text-stone-300 sm:text-lg">
           A simple implementation of the classic "Lights Out" puzzle game, built with ReactTS and Tailwind CSS.
         </p>
         

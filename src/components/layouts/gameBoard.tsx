@@ -101,7 +101,6 @@ export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount:
       {tiles.map((tile) => (
         <Tile
           key={tile.index}
-          number={tile.label}
           state={tile.state}
           onClick={() => {
               toggleState(tile.index);
