@@ -1,5 +1,5 @@
 import Tile from "@/components/ui/Tile";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // import Model from "@/model/Model";
 
 interface TileData {
@@ -16,7 +16,7 @@ const BOARD_SIZE = 5;
 const ROW_NUMS = Array.from({ length: BOARD_SIZE }, (_, i) => i);
 const COL_NUMS = Array.from({ length: BOARD_SIZE }, (_, i) => i);
 
-const startingTiles: TileData[] = ROW_NUMS.flatMap((row) =>
+const startingTiles: () => TileData[] = () => ROW_NUMS.flatMap((row) =>
   COL_NUMS.map((col) => ({
     index: row * BOARD_SIZE + col,
     label: row * BOARD_SIZE + col + 1,
@@ -26,7 +26,19 @@ const startingTiles: TileData[] = ROW_NUMS.flatMap((row) =>
   }))
 );
 
-export const GameBoard = ({ onBoardChange }: { onBoardChange: () => void }) => {
+// for debugging, make a starting board with a one-move solution
+// const startingTiles: TileData[] = ROW_NUMS.flatMap((row) =>
+//   COL_NUMS.map((col) => ({
+//     index: row * BOARD_SIZE + col,
+//     label: row * BOARD_SIZE + col + 1,
+//     state: ([8, 12, 13, 14, 18].includes(row * BOARD_SIZE + col + 1)) ? true : false,
+//     row,
+//     col,
+//   }))
+// );
+
+export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount: () => void; winGame: () => void;}) => {
+
   const findAffectedIndices = (index: number): Set<number> => {
     const affectedIndices = new Set<number>();
     affectedIndices.add(index)
@@ -52,15 +64,39 @@ export const GameBoard = ({ onBoardChange }: { onBoardChange: () => void }) => {
   const [tiles, setTiles] = useState<TileData[]>(startingTiles);
   const toggleState = (index: number) => {
     const affectedIndices = findAffectedIndices(index);
-    setTiles(prev => prev.map(tile => {
+    const newTiles = tiles.map(tile => {
       if (affectedIndices.has(tile.index)) {
         return { ...tile, state: !tile.state };
       }
       return tile;
-    }));
+    });
+    setTiles(newTiles);
+  };
+
+  const hasWon = tiles.every(tile => tile.state === false);
+  useEffect(() => {
+    if (hasWon) {
+      winGame();
+    }
+  }, [hasWon, winGame]);
+
+   const autoWin = () => {
+    const newTiles = tiles.map(tile => ({ ...tile, state: false }));
+    setTiles(newTiles);
   };
 
   return (
+    <>
+    <div className="mb-2">
+        <button
+          onClick={() => {autoWin(); incrementMoveCount(); }}
+          className="px-3 py-1 bg-green-600 text-white rounded"
+        >
+          Click to win
+        </button>
+      </div>
+
+
     <div className={`grid grid-cols-5 gap-1 w-full h-full`}>
       {tiles.map((tile) => (
         <Tile
@@ -69,12 +105,13 @@ export const GameBoard = ({ onBoardChange }: { onBoardChange: () => void }) => {
           state={tile.state}
           onClick={() => {
               toggleState(tile.index);
-              onBoardChange();
+              incrementMoveCount();
             }
           }
         />
       ))}
     </div>
+    </>
   );
 };
 
