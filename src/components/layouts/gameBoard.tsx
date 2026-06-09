@@ -16,26 +16,26 @@ const BOARD_SIZE = 5;
 const ROW_NUMS = Array.from({ length: BOARD_SIZE }, (_, i) => i);
 const COL_NUMS = Array.from({ length: BOARD_SIZE }, (_, i) => i);
 
-const startingTiles: () => TileData[] = () => ROW_NUMS.flatMap((row) =>
-  COL_NUMS.map((col) => ({
-    index: row * BOARD_SIZE + col,
-    label: row * BOARD_SIZE + col + 1,
-    state: Math.random() < 0.5,
-    row,
-    col,
-  }))
-);
-
-// for debugging, make a starting board with a one-move solution
-// const startingTiles: TileData[] = ROW_NUMS.flatMap((row) =>
+// const startingTiles: () => TileData[] = () => ROW_NUMS.flatMap((row) =>
 //   COL_NUMS.map((col) => ({
 //     index: row * BOARD_SIZE + col,
 //     label: row * BOARD_SIZE + col + 1,
-//     state: ([8, 12, 13, 14, 18].includes(row * BOARD_SIZE + col + 1)) ? true : false,
+//     state: Math.random() < 0.5,
 //     row,
 //     col,
 //   }))
 // );
+
+// for debugging, make a starting board with a one-move solution
+const startingTiles: TileData[] = ROW_NUMS.flatMap((row) =>
+  COL_NUMS.map((col) => ({
+    index: row * BOARD_SIZE + col,
+    label: row * BOARD_SIZE + col + 1,
+    state: ([8, 12, 13, 14, 18].includes(row * BOARD_SIZE + col + 1)) ? true : false,
+    row,
+    col,
+  }))
+);
 
 export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount: () => void; winGame: () => void;}) => {
 
@@ -103,8 +103,10 @@ export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount:
           key={tile.index}
           state={tile.state}
           onClick={() => {
+            if (!hasWon) {
               toggleState(tile.index);
               incrementMoveCount();
+            }
             }
           }
         />
