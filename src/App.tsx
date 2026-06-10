@@ -17,12 +17,14 @@ function App() {
 
   return (
     <main className="relative min-h-screen overflow-hidden px-6 py-12 text-stone-900 sm:px-10">
-      <p className="mx-auto mb-10 text-center w-fit rounded-sm px-4 py-3 text-4xl uppercase tracking-[0.30em] text-amber-200">
+      <p className="mx-auto mb-10 text-center w-fit rounded-sm px-4 py-3 text-4xl uppercase tracking-[0.30em] text-amber-300">
         Lights Out
       </p>
 
       {isWon && (
-        <div className="fixed left-1/2 top-1/2 z-20 w-lg max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/40 bg-stone-950/80 px-6 py-10 text-center text-white shadow-[0_30px_80px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:px-10 sm:py-14">
+        <div className="fixed left-1/2 top-1/2 z-20 w-lg max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/40 px-6 py-10 text-center text-white shadow-[0_30px_80px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:px-10 sm:py-14 transition-opacity duration-300"
+        style={{ backgroundColor: '#1d2021cc'}}
+        >
           <p className="uppercase tracking-[0.22em] text-amber-300 sm:text-5xl">
             You Win
           </p>
