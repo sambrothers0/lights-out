@@ -1,4 +1,5 @@
 import GameBoard from '@/components/layouts/gameBoard';
+import { AnimatePresence } from 'motion/react';
 import { useState } from 'react';
 
 function App() {
@@ -7,15 +8,13 @@ function App() {
 
   const [difficulty, setDifficulty] = useState('Normal');
   const changeDifficulty = () => {
+    setDifficulty(prev => {
+      if (prev === 'Easy') return 'Normal';
+      if (prev === 'Normal') return 'Hard';
+      return 'Easy';
+    });
     resetGame();
-    if (difficulty === 'Easy') {
-      setDifficulty('Normal');
-    } else if (difficulty === 'Normal') {
-      setDifficulty('Hard');
-    } else {
-      setDifficulty('Easy');
-    }
-  }
+  };
 
   const [hasWon, setHasWon] = useState(false);
   const winGame = () => setHasWon(true);
@@ -59,7 +58,9 @@ function App() {
         </div>
 
       <section className="relative mx-auto flex h-[70vmin] w-[70vmin] items-center justify-center">
-        <GameBoard incrementMoveCount={incrementMoveCount} difficulty={difficulty} winGame={winGame} key={resetKey}/>
+        <AnimatePresence mode="wait">
+          <GameBoard incrementMoveCount={incrementMoveCount} difficulty={difficulty} winGame={winGame} key={resetKey}/>
+        </AnimatePresence>
       </section>
 
       <p className="mb-4 mt-10 text-center text-sm font-medium uppercase tracking-[0.2em] text-stone-400">
@@ -67,7 +68,7 @@ function App() {
       </p>
 
       <button 
-        className="block mx-auto w-fit my-5 rounded-full border border-stone-700 px-3 py-1 text-base font-semibold text-stone-300 transition hover:bg-stone-600"
+        className={`block mx-auto w-fit my-5 rounded-full border border-stone-700 px-3 py-1 text-base font-semibold text-stone-300 transition ${!hasWon && 'hover:bg-stone-600'}`}
         onClick={() => {
           if (hasWon) {
             return;

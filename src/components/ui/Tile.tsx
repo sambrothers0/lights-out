@@ -2,17 +2,18 @@ import React from 'react';
 import { motion } from 'motion/react';
 
 interface TileProps {
-  state: boolean;
+  isFlipped: boolean;
   number?: number;
   className?: string;
   highlighted: boolean;
+  animationDelay: number;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
   onClick: () => void;
 }
 
-export const Tile: React.FC<TileProps> = ({ state, number, className = '', highlighted, onMouseEnter, onMouseLeave, onClick }) => {
-  const stateClassName = state
+export const Tile: React.FC<TileProps> = ({ isFlipped, number, className = '', highlighted, animationDelay, onMouseEnter, onMouseLeave, onClick }) => {
+  const stateClassName = isFlipped
     ? 'bg-amber-300 text-amber-950'
     : 'bg-stone-700 text-stone-100';
 
@@ -26,17 +27,15 @@ export const Tile: React.FC<TileProps> = ({ state, number, className = '', highl
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onClick={onClick}
-      className={`flex
-        w-full aspect-square items-center justify-center rounded-sm text-xl font-semibold transition-[background-color,color] ${stateClassName} ${borderClassName} ${className}`}
-      initial={false}
-      animate={{
-        rotateY: state ? 180 : 0,
-      }}
+      className={`flex w-full aspect-square items-center justify-center rounded-sm text-xl font-semibold transition-[background-color,color] ${stateClassName} ${borderClassName} ${className}`}
+      initial={{ x: 100, opacity: 0, rotateY: isFlipped ? 180 : 0 }}
+      animate={{ rotateY: isFlipped ? 180 : 0, opacity: 1, x: 0 }}
+      exit={{ x: -100, opacity: 0 }}
       transition={{
-        duration: 0.2,
-        ease: 'easeIn',
+        rotateY: { duration: 0.2, ease: 'easeOut' },
+        x: { duration: 0.15, ease: 'easeInOut', delay: animationDelay },
+        opacity: { duration: 0.15, ease: 'easeInOut', delay: animationDelay },
       }}
-
     >
       {number}
     </motion.button>
