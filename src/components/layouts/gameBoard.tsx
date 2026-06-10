@@ -11,36 +11,41 @@ interface TileData {
   col: number;
 }
 
-const BOARD_SIZE = 5;
 
-// from board size make an iterable to construct board
-const ROW_NUMS = Array.from({ length: BOARD_SIZE }, (_, i) => i);
-const COL_NUMS = Array.from({ length: BOARD_SIZE }, (_, i) => i);
+export const GameBoard = ({ incrementMoveCount, difficulty, winGame }: 
+  { incrementMoveCount: () => void; difficulty: string; winGame: () => void;}) => {
+    
+  let BOARD_SIZE: number;
+  if (difficulty === 'Easy') {BOARD_SIZE = 4} 
+  else if (difficulty === 'Normal') {BOARD_SIZE = 5} 
+  else {BOARD_SIZE = 7};
 
-// const startingTiles: () => TileData[] = () => ROW_NUMS.flatMap((row) =>
-//   COL_NUMS.map((col) => ({
-//     index: row * BOARD_SIZE + col,
-//     label: row * BOARD_SIZE + col + 1,
-//     state: Math.random() < 0.5,
-//     highlighted: false,
-//     row,
-//     col,
-//   }))
-// );
-
-// for debugging, make a starting board with a one-move solution
-const startingTiles: TileData[] = ROW_NUMS.flatMap((row) =>
-  COL_NUMS.map((col) => ({
-    index: row * BOARD_SIZE + col,
-    label: row * BOARD_SIZE + col + 1,
-    state: ([8, 12, 13, 14, 18].includes(row * BOARD_SIZE + col + 1)) ? true : false,
-    highlighted: false,
-    row,
-    col,
-  }))
-);
-
-export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount: () => void; winGame: () => void;}) => {
+  // from board size make an iterable to construct board
+  const ROW_NUMS = Array.from({ length: BOARD_SIZE }, (_, i) => i);
+  const COL_NUMS = Array.from({ length: BOARD_SIZE }, (_, i) => i);
+  
+  // const startingTiles: () => TileData[] = () => ROW_NUMS.flatMap((row) =>
+  //   COL_NUMS.map((col) => ({
+  //     index: row * BOARD_SIZE + col,
+  //     label: row * BOARD_SIZE + col + 1,
+  //     state: Math.random() < 0.5,
+  //     highlighted: false,
+  //     row,
+  //     col,
+  //   }))
+  // );
+  
+  // for debugging, make a starting board with a one-move solution
+  const startingTiles: TileData[] = ROW_NUMS.flatMap((row) =>
+    COL_NUMS.map((col) => ({
+      index: row * BOARD_SIZE + col,
+      label: row * BOARD_SIZE + col + 1,
+      state: ([8, 12, 13, 14, 18].includes(row * BOARD_SIZE + col + 1)) ? true : false,
+      highlighted: false,
+      row,
+      col,
+    }))
+  );
 
   const findAffectedIndices = (index: number): Set<number> => {
     const affectedIndices = new Set<number>();
@@ -64,7 +69,7 @@ export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount:
     return affectedIndices;
   };
 
-  const hoverHandler = (index?: number) => {
+  const handleHover = (index?: number) => {
     if (index === undefined || hasWon) {
       const clearedHoverTiles = tiles.map(tile => ({ ...tile, highlighted: false }));
       setTiles(clearedHoverTiles);
@@ -97,6 +102,7 @@ export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount:
   const hasWon = tiles.every(tile => tile.state === false);
   useEffect(() => {
     if (hasWon) {
+      handleHover();
       winGame();
     }
   }, [hasWon, winGame]);
@@ -113,14 +119,14 @@ export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount:
       </div> */}
 
 
-    <div className={`grid grid-cols-5 gap-1 w-full h-full`}>
+    <div className={`grid ${{ 4: 'grid-cols-4', 5: 'grid-cols-5', 7: 'grid-cols-7' }[BOARD_SIZE]} gap-1 w-full h-full`}>
       {tiles.map((tile) => (
         <Tile
           key={tile.index}
           state={tile.state}
           highlighted={tile.highlighted}
-          onMouseEnter={() => {hoverHandler(tile.index)}}
-          onMouseLeave={() => {hoverHandler()}}
+          onMouseEnter={() => {handleHover(tile.index)}}
+          onMouseLeave={() => {handleHover()}}
           onClick={() => {
             if (!hasWon) {
               toggleState(tile.index);

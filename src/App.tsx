@@ -5,12 +5,24 @@ function App() {
   const [moveCount, setMoveCount] = useState(0);
   const incrementMoveCount = () => setMoveCount(prev => prev + 1);
 
-  const [isWon, setIsWon] = useState(false);
-  const winGame = () => setIsWon(true);
+  const [difficulty, setDifficulty] = useState('Normal');
+  const changeDifficulty = () => {
+    resetGame();
+    if (difficulty === 'Easy') {
+      setDifficulty('Normal');
+    } else if (difficulty === 'Normal') {
+      setDifficulty('Hard');
+    } else {
+      setDifficulty('Easy');
+    }
+  }
+
+  const [hasWon, setHasWon] = useState(false);
+  const winGame = () => setHasWon(true);
 
   const [resetKey, setResetKey] = useState(0);
   const resetGame = () => {
-    setIsWon(false);
+    setHasWon(false);
     setResetKey(prev => prev + 1);
     setMoveCount(0);
   }
@@ -21,14 +33,13 @@ function App() {
         Lights Out
       </p>
 
-      {isWon && (
-        <div className="fixed left-1/2 top-1/2 z-20 w-lg max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/40 px-6 py-10 text-center text-white shadow-[0_30px_80px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:px-10 sm:py-14 transition-opacity duration-300"
+      <div className={`fixed left-1/2 top-1/2 z-20 w-lg max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/40 px-6 py-10 text-center text-white shadow-[0_30px_80px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:px-10 sm:py-14 transition-opacity duration-1000 ${hasWon ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         style={{ backgroundColor: '#1d2021cc'}}
         >
           <p className="uppercase tracking-[0.22em] text-amber-300 sm:text-5xl">
             You Win
           </p>
-          {moveCount == 1 && (
+          {moveCount <= 1 && (
             <p className="mt-6 text-md text-stone-400 sm:text-lg">
               Solved in 1 move
             </p>
@@ -46,10 +57,9 @@ function App() {
             Play Again
           </button>
         </div>
-      )}
 
       <section className="relative mx-auto flex h-[70vmin] w-[70vmin] items-center justify-center">
-        <GameBoard incrementMoveCount={incrementMoveCount} winGame={winGame} key={resetKey}/>
+        <GameBoard incrementMoveCount={incrementMoveCount} difficulty={difficulty} winGame={winGame} key={resetKey}/>
       </section>
 
       <p className="mb-4 mt-10 text-center text-sm font-medium uppercase tracking-[0.2em] text-stone-400">
@@ -58,9 +68,14 @@ function App() {
 
       <button 
         className="block mx-auto w-fit my-5 rounded-full border border-stone-700 px-3 py-1 text-base font-semibold text-stone-300 transition hover:bg-stone-600"
-        onClick={() => {}}
+        onClick={() => {
+          if (hasWon) {
+            return;
+          }
+          changeDifficulty();
+        }}
         >
-        {"Difficulty"}
+        {difficulty}
       </button> 
 
       <div className="mx-auto my-12 h-px w-[80vmin] bg-stone-700" />
