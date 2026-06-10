@@ -17,28 +17,28 @@ const BOARD_SIZE = 5;
 const ROW_NUMS = Array.from({ length: BOARD_SIZE }, (_, i) => i);
 const COL_NUMS = Array.from({ length: BOARD_SIZE }, (_, i) => i);
 
-// const startingTiles: () => TileData[] = () => ROW_NUMS.flatMap((row) =>
-//   COL_NUMS.map((col) => ({
-//     index: row * BOARD_SIZE + col,
-//     label: row * BOARD_SIZE + col + 1,
-//     state: Math.random() < 0.5,
-//     hovered: false,
-//     row,
-//     col,
-//   }))
-// );
-
-// for debugging, make a starting board with a one-move solution
-const startingTiles: TileData[] = ROW_NUMS.flatMap((row) =>
+const startingTiles: () => TileData[] = () => ROW_NUMS.flatMap((row) =>
   COL_NUMS.map((col) => ({
     index: row * BOARD_SIZE + col,
     label: row * BOARD_SIZE + col + 1,
-    state: ([8, 12, 13, 14, 18].includes(row * BOARD_SIZE + col + 1)) ? true : false,
+    state: Math.random() < 0.5,
     highlighted: false,
     row,
     col,
   }))
 );
+
+// // for debugging, make a starting board with a one-move solution
+// const startingTiles: TileData[] = ROW_NUMS.flatMap((row) =>
+//   COL_NUMS.map((col) => ({
+//     index: row * BOARD_SIZE + col,
+//     label: row * BOARD_SIZE + col + 1,
+//     state: ([8, 12, 13, 14, 18].includes(row * BOARD_SIZE + col + 1)) ? true : false,
+//     highlighted: false,
+//     row,
+//     col,
+//   }))
+// );
 
 export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount: () => void; winGame: () => void;}) => {
 
@@ -64,26 +64,20 @@ export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount:
     return affectedIndices;
   };
 
-  const mouseEnterHandler = (index: number) => {
+  const hoverHandler = (index?: number) => {
+    if (index === undefined) {
+      const clearedHoverTiles = tiles.map(tile => ({ ...tile, highlighted: false }));
+      setTiles(clearedHoverTiles);
+      return;
+    }
     const affectedIndices = findAffectedIndices(index);
-    const newTiles = tiles.map(tile => {
+    const enteredTiles = tiles.map(tile => {
       if (affectedIndices.has(tile.index)) {
         return { ...tile, highlighted: true };
       }
-      return tile;
+      return { ...tile, highlighted: false };
     });
-    setTiles(newTiles);
-  }
-
-  const mouseLeaveHandler = (index: number) => {
-    const affectedIndices = findAffectedIndices(index);
-    const newTiles = tiles.map(tile => {
-      if (affectedIndices.has(tile.index)) {
-        return { ...tile, highlighted: false };
-      }
-      return tile;
-    });
-    setTiles(newTiles);
+    setTiles(enteredTiles);
   }
 
   const [tiles, setTiles] = useState<TileData[]>(startingTiles);
@@ -125,8 +119,8 @@ export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount:
           key={tile.index}
           state={tile.state}
           highlighted={tile.highlighted}
-          onMouseEnter={() => {mouseEnterHandler(tile.index)}}
-          onMouseLeave={() => {mouseLeaveHandler(tile.index)}}
+          onMouseEnter={() => {hoverHandler(tile.index)}}
+          onMouseLeave={() => {hoverHandler()}}
           onClick={() => {
             if (!hasWon) {
               toggleState(tile.index);

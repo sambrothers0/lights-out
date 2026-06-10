@@ -12,7 +12,7 @@ interface TileProps {
 
 export const Tile: React.FC<TileProps> = ({ state, number, className = '', highlighted, onMouseEnter, onMouseLeave, onClick }) => {
   const stateClassName = state
-    ? 'bg-amber-200 text-amber-950'
+    ? 'bg-amber-300 text-amber-950'
     : 'bg-stone-700 text-stone-100';
 
   const borderClassName = highlighted
@@ -25,7 +25,8 @@ export const Tile: React.FC<TileProps> = ({ state, number, className = '', highl
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onClick={onClick}
-      className={`flex w-full aspect-square items-center justify-center rounded-sm border-2 text-xl font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-900 focus-visible:ring-offset-2 ${stateClassName} ${borderClassName} ${className}`}
+      className={`flex
+        w-full aspect-square items-center justify-center rounded-sm border-7 text-xl font-semibold transition-[background-color,color] ${stateClassName} ${borderClassName} ${className}`}
     >
       {number}
     </button>
