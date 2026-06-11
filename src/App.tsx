@@ -26,8 +26,10 @@ function App() {
   const [resetKey, setResetKey] = useState(0);
   const resetGame = () => {
     setHasWon(false);
-    setResetKey(prev => prev + 1);
-    setMoveCount(0);
+    setTimeout(() => {
+      setResetKey(prev => prev + 1);
+      setMoveCount(0);
+    }, 300);
   }
 
   return (
@@ -36,7 +38,7 @@ function App() {
         Lights Out
       </p>
 
-      <div className={`fixed left-1/2 top-1/2 z-20 w-lg max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/40 px-6 py-10 text-center text-white shadow-[0_30px_80px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:px-10 sm:py-14 transition-opacity duration-400 ${hasWon ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+      <div className={`fixed left-1/2 top-1/2 z-20 w-lg max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/40 px-6 py-10 text-center text-white shadow-[0_30px_80px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:px-10 sm:py-14 transition-opacity duration-300 ${hasWon ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         style={{ backgroundColor: '#1d2021cc'}}
         >
           <p className="uppercase tracking-[0.22em] text-amber-300 sm:text-5xl">
