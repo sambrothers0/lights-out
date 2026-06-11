@@ -1,6 +1,6 @@
 import GameBoard from '@/components/layouts/gameBoard';
 import { AnimatePresence } from 'motion/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function App() {
   const [moveCount, setMoveCount] = useState(0);
@@ -32,6 +32,14 @@ function App() {
     setResetKey(prev => prev + 1);
     setMoveCount(0);
   };
+
+  useEffect(() => {
+    if (hasWon) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [hasWon]);
 
   return (
     <main className="relative min-h-screen overflow-hidden px-6 py-12 text-stone-900 sm:px-10">
@@ -66,7 +74,11 @@ function App() {
 
       <section className="relative mx-auto flex h-[70vmin] w-[70vmin] items-center justify-center">
         <AnimatePresence mode="wait">
-          <GameBoard incrementMoveCount={incrementMoveCount} difficulty={difficulty} winGame={winGame} key={resetKey}/>
+          <GameBoard 
+          incrementMoveCount={incrementMoveCount}
+          difficulty={difficulty} 
+          winGame={winGame} 
+          key={resetKey}/>
         </AnimatePresence>
       </section>
 
@@ -89,15 +101,39 @@ function App() {
       <div className="mx-auto my-12 h-px w-[80vmin] bg-stone-700" />
       
       <p className="mx-auto max-w-2xl my-4 text-center text-stone-300 sm:text-md">
-        <a href="https://en.wikipedia.org/wiki/Lights_Out_(game)" className="underline underline-offset-4" target="_blank" rel="noreferrer">Game Info</a>
+        <a href="https://en.wikipedia.org/wiki/Lights_Out_(game)" 
+          className="underline underline-offset-4" 
+          target="_blank" 
+          rel="noreferrer"
+          >
+          Game Info
+        </a>
         <br />
-        <a href="https://github.com/sambrothers0/lights-out" className="underline underline-offset-4" target="_blank" rel="noreferrer">Code</a>
+        <a href="https://github.com/sambrothers0/lights-out" 
+          className="underline underline-offset-4" 
+          target="_blank" 
+          rel="noreferrer"
+          >
+          Code
+        </a>
         <br />
-        <a href="https://www.youtube.com/watch?v=ffCWa3Cppk4" className="underline underline-offset-4" target="_blank" rel="noreferrer">Solution</a>
+        <a href="https://www.youtube.com/watch?v=ffCWa3Cppk4" 
+          className="underline underline-offset-4" 
+          target="_blank" 
+          rel="noreferrer"
+          >
+          Solution
+        </a>
       </p>
 
       <p className="mx-auto max-w-2xl mt-8 text-center text-sm text-stone-500 sm:text-base">
-        Created by <a href="https://sambrothers0.github.io" className="underline underline-offset-4" target="_blank" rel="noreferrer">Sam Brothers</a>
+        Created by <a href="https://sambrothers0.github.io"
+          className="underline underline-offset-4"
+          target="_blank"
+          rel="noreferrer"
+          >
+          Sam Brothers
+        </a>
       </p>
 
     </main>
