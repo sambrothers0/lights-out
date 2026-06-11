@@ -6,23 +6,13 @@ function App() {
   const [moveCount, setMoveCount] = useState(0);
   const incrementMoveCount = () => setMoveCount(prev => prev + 1);
 
-  const [difficulty, setDifficulty] = useState('Normal');
-  const changeDifficulty = () => {
-    setDifficulty(prev => {
-      if (prev === 'Easy') return 'Normal';
-      if (prev === 'Normal') return 'Hard';
-      return 'Easy';
-    });
-    resetGame();
-  };
-
   const [hasWon, setHasWon] = useState(false);
   const winGame = () => {
     setTimeout(() => {
       setHasWon(true);
     }, 500);
   };
-
+  
   const [resetKey, setResetKey] = useState(0);
   const resetGame = () => {
     setHasWon(false);
@@ -31,6 +21,17 @@ function App() {
       setMoveCount(0);
     }, 300);
   }
+  
+  const [difficulty, setDifficulty] = useState('Normal');
+  const changeDifficulty = () => {
+    setDifficulty(prev => {
+      if (prev === 'Easy') return 'Normal';
+      if (prev === 'Normal') return 'Hard';
+      return 'Easy';
+    });
+    setResetKey(prev => prev + 1);
+    setMoveCount(0);
+  };
 
   return (
     <main className="relative min-h-screen overflow-hidden px-6 py-12 text-stone-900 sm:px-10">
