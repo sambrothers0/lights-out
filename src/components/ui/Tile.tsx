@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '@/lib/utils';
 import { motion } from 'motion/react';
 
 interface TileProps {
@@ -13,21 +14,19 @@ interface TileProps {
 }
 
 export const Tile: React.FC<TileProps> = ({ isFlipped, number, className = '', highlighted, animationDelay, onMouseEnter, onMouseLeave, onClick }) => {
-  const stateClassName = isFlipped
-    ? 'bg-amber-300 text-amber-950'
-    : 'bg-stone-700 text-stone-100';
-
-  const borderClassName = highlighted
-    ? 'border-[0.6vmin] border-white'
-    : 'border-[0.6vmin] border-transparent';
-
   return (
     <motion.button
       type="button"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onClick={onClick}
-      className={`flex w-full aspect-square items-center justify-center rounded-sm text-xl font-semibold transition-[background-color,color] ${stateClassName} ${borderClassName} ${className}`}
+      className={cn(
+        'flex w-full aspect-square items-center justify-center rounded-sm text-xl font-semibold transition-[background-color]',
+        isFlipped ? 'bg-amber-300 text-amber-950' : 'bg-stone-700 text-stone-100',
+        'border-[0.6vmin]',
+        highlighted ? 'border-white' : 'border-transparent',
+        className
+      )}
       initial={{ x: 100, opacity: 0, rotateY: isFlipped ? 180 : 0 }}
       animate={{ rotateY: isFlipped ? 180 : 0, opacity: 1, x: 0 }}
       exit={{ x: -100, opacity: 0 }}

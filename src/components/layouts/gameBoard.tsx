@@ -1,6 +1,5 @@
 import Tile from "@/components/ui/Tile";
 import { useEffect, useState } from "react";
-import {motion} from 'motion/react';
 
 interface TileData {
   index: number;
@@ -87,6 +86,18 @@ export const GameBoard = ({ incrementMoveCount, difficulty, winGame }:
   }
 
   const [tiles, setTiles] = useState<TileData[]>(startingTiles);
+
+  // DEBUG: press 'w' to auto win
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'w' || e.key === 'W') {
+        setTiles(prev => prev.map(tile => ({ ...tile, isFlipped: false })));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const toggleState = (index: number) => {
     const affectedIndices = findAffectedIndices(index);
     const newTiles = tiles.map(tile => {
