@@ -4,6 +4,8 @@ import GameBoard from '@/components/layouts/gameBoard';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 
+export type Difficulty = 'Easy' | 'Normal' | 'Hard';
+
 function App() {
   const [moveCount, setMoveCount] = useState(0);
   const incrementMoveCount = () => setMoveCount(prev => prev + 1);
@@ -24,7 +26,7 @@ function App() {
     }, 300);
   }
   
-  const [difficulty, setDifficulty] = useState('Normal');
+  const [difficulty, setDifficulty] = useState<Difficulty>('Normal');
   const changeDifficulty = () => {
     setDifficulty(prev => {
       if (prev === 'Easy') return 'Normal';

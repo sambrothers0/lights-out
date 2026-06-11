@@ -1,5 +1,6 @@
 import Tile from "@/components/ui/Tile";
 import { cn } from "@/lib/utils";
+import type { Difficulty } from "@/App.tsx";
 import { useEffect, useState } from "react";
 
 interface TileData {
@@ -11,17 +12,17 @@ interface TileData {
   col: number;
 }
 
-
-
 export const GameBoard = ({ incrementMoveCount, difficulty, winGame }:
-  { incrementMoveCount: () => void; difficulty: string; winGame: () => void;}) => {
+  { incrementMoveCount: () => void; difficulty: Difficulty; winGame: () => void;}) => {
 
-    let BOARD_SIZE: number;
-    if (difficulty === 'Easy') {BOARD_SIZE = 4} 
-    else if (difficulty === 'Normal') {BOARD_SIZE = 5} 
-    else {BOARD_SIZE = 7};
+    const BOARD_SIZES: Record<Difficulty, number> = {
+      'Easy': 4,
+      'Normal': 5,
+      'Hard': 7,
+    };
     
     // from board size make an iterable to construct board
+    const BOARD_SIZE = BOARD_SIZES[difficulty];
     const ROW_NUMS = Array.from({ length: BOARD_SIZE }, (_, i) => i);
     const COL_NUMS = Array.from({ length: BOARD_SIZE }, (_, i) => i);
     
@@ -38,23 +39,16 @@ export const GameBoard = ({ incrementMoveCount, difficulty, winGame }:
     
     const [tiles, setTiles] = useState<TileData[]>(startingTiles);
     
-    const hasWon = tiles.every(tile => tile.isFlipped === false);
-    useEffect(() => {
-      if (hasWon) {
-        handleHover();
-        winGame();
-      }
-    }, [hasWon, winGame]);
-
-  // for clicking and highlighting
-  const findAffectedIndices = (index: number): Set<number> => {
-    const affectedIndices = new Set<number>();
-    affectedIndices.add(index)
     
-    const tile = tiles.find(tile => tile.index === index);
+    // for clicking and highlighting
+    const findAffectedIndices = (index: number): Set<number> => {
+      const affectedIndices = new Set<number>();
+      affectedIndices.add(index)
+      
+      const tile = tiles.find(tile => tile.index === index);
     if (!tile) return affectedIndices;
-    affectedIndices.add(tile.index - BOARD_SIZE);
     if (tile.row > 0) {
+      affectedIndices.add(tile.index - BOARD_SIZE);
     }
     if (tile.row < BOARD_SIZE - 1) {
       affectedIndices.add(tile.index + BOARD_SIZE);
@@ -82,9 +76,16 @@ export const GameBoard = ({ incrementMoveCount, difficulty, winGame }:
       return { ...tile, highlighted: false };
     });
     setTiles(enteredTiles);
-
+    
   }
-
+  
+  const hasWon = tiles.every(tile => tile.isFlipped === false);
+  useEffect(() => {
+    if (hasWon) {
+      winGame();
+    }
+  }, [hasWon, winGame]);
+  
   const toggleState = (index: number) => {
     const affectedIndices = findAffectedIndices(index);
     const newTiles = tiles.map(tile => {
@@ -125,7 +126,7 @@ export const GameBoard = ({ incrementMoveCount, difficulty, winGame }:
         <Tile
           key={tile.index}
           isFlipped={tile.isFlipped}
-          highlighted={tile.highlighted}
+          highlighted={!hasWon && tile.highlighted}
           animationDelay={animationDelay}
           onMouseEnter={() => {handleHover(tile.index)}}
           onMouseLeave={() => {handleHover()}}
