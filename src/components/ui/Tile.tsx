@@ -1,25 +1,42 @@
-import React from 'react';
+import { cn } from '@/lib/utils';
+import { motion } from 'motion/react';
 
 interface TileProps {
-  state: boolean;
-  number: number;
+  isFlipped: boolean;
+  number?: number;
   className?: string;
+  highlighted: boolean;
+  animationDelay: number;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
   onClick: () => void;
 }
 
-export const Tile: React.FC<TileProps> = ({ state, number, className = '', onClick }) => {
-  const stateClassName = state
-    ? 'bg-amber-100 text-amber-950 border-amber-200'
-    : 'bg-stone-700 text-stone-100 border-stone-800';
-
+export const Tile: React.FC<TileProps> = ({ isFlipped, number, className = '', highlighted, animationDelay, onMouseEnter, onMouseLeave, onClick }) => {
   return (
-    <button
+    <motion.button
       type="button"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       onClick={onClick}
-      className={`flex w-full aspect-square items-center justify-center rounded-sm border text-xl font-semibold shadow-sm transition-shadow hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-900 focus-visible:ring-offset-2 ${stateClassName} ${className}`}
+      className={cn(
+        'flex w-full aspect-square items-center justify-center rounded-sm text-xl font-semibold transition-[background-color]',
+        isFlipped ? 'bg-amber-300 text-amber-950' : 'bg-stone-700 text-stone-100',
+        'border-[0.6vmin]',
+        highlighted ? 'border-white' : 'border-transparent',
+        className
+      )}
+      initial={{ x: 100, opacity: 0, rotateY: isFlipped ? 180 : 0 }}
+      animate={{ rotateY: isFlipped ? 180 : 0, opacity: 1, x: 0 }}
+      exit={{ x: -100, opacity: 0 }}
+      transition={{
+        rotateY: { duration: 0.2, ease: 'easeOut' },
+        x: { duration: 0.15, ease: 'easeInOut', delay: animationDelay },
+        opacity: { duration: 0.15, ease: 'easeInOut', delay: animationDelay },
+      }}
     >
       {number}
-    </button>
+    </motion.button>
   );
 };
 
