@@ -39,7 +39,6 @@ export const GameBoard = ({ incrementMoveCount, difficulty, winGame }:
     
     const [tiles, setTiles] = useState<TileData[]>(startingTiles);
     
-    
     // for clicking and highlighting
     const findAffectedIndices = (index: number): Set<number> => {
       const affectedIndices = new Set<number>();
@@ -99,7 +98,7 @@ export const GameBoard = ({ incrementMoveCount, difficulty, winGame }:
     setTiles(newTiles);
   };
   
-  // DEBUG: press 'w' to auto win
+  // DEBUG: press 'w' to auto win. this could also just be an easter egg for the user
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'w' || e.key === 'W') {

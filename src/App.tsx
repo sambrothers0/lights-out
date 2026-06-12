@@ -72,16 +72,9 @@ function App() {
               <p className="uppercase tracking-[0.22em] text-amber-300 sm:text-5xl">
                 You Win
               </p>
-              {moveCount <= 1 && (
-                <p className="mt-6 text-md text-stone-400 sm:text-lg">
-                  Solved in 1 move
-                </p>
-              )}
-              {moveCount > 1 && (
-                <p className="mt-6 text-md text-stone-400 sm:text-lg">
-                  Solved in {moveCount} moves
-                </p>
-              )}
+              <p className="mt-6 text-md text-stone-400 sm:text-lg">
+                Solved in {moveCount} {moveCount === 1 ? 'move' : 'moves'}
+              </p>
               <button
                 type="button"
                 className="mt-10 rounded-full border border-amber-300/40 bg-amber-300 px-6 py-3 text-base font-semibold text-stone-950 transition hover:scale-[1.02] hover:bg-amber-300 focus:outline-none"
@@ -110,12 +103,8 @@ function App() {
 
       <button 
         className={`block mx-auto w-fit my-5 rounded-full border border-stone-700 px-3 py-1 text-base font-semibold text-stone-300 transition ${!hasWon && 'hover:bg-stone-600'}`}
-        onClick={() => {
-          if (hasWon) {
-            return;
-          }
-          changeDifficulty();
-        }}
+        disabled={hasWon}
+        onClick={changeDifficulty}
         >
         {difficulty}
       </button> 
