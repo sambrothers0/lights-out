@@ -6,6 +6,7 @@ interface TileData {
   index: number;
   label: number;
   state: boolean;
+  highlighted: boolean;
   row: number;
   col: number;
 }
@@ -21,17 +22,19 @@ const startingTiles: () => TileData[] = () => ROW_NUMS.flatMap((row) =>
     index: row * BOARD_SIZE + col,
     label: row * BOARD_SIZE + col + 1,
     state: Math.random() < 0.5,
+    highlighted: false,
     row,
     col,
   }))
 );
 
-// for debugging, make a starting board with a one-move solution
+// // for debugging, make a starting board with a one-move solution
 // const startingTiles: TileData[] = ROW_NUMS.flatMap((row) =>
 //   COL_NUMS.map((col) => ({
 //     index: row * BOARD_SIZE + col,
 //     label: row * BOARD_SIZE + col + 1,
 //     state: ([8, 12, 13, 14, 18].includes(row * BOARD_SIZE + col + 1)) ? true : false,
+//     highlighted: false,
 //     row,
 //     col,
 //   }))
@@ -61,13 +64,31 @@ export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount:
     return affectedIndices;
   };
 
+  const hoverHandler = (index?: number) => {
+    if (index === undefined) {
+      const clearedHoverTiles = tiles.map(tile => ({ ...tile, highlighted: false }));
+      setTiles(clearedHoverTiles);
+      return;
+    }
+    const affectedIndices = findAffectedIndices(index);
+    const enteredTiles = tiles.map(tile => {
+      if (affectedIndices.has(tile.index)) {
+        return { ...tile, highlighted: true };
+      }
+      return { ...tile, highlighted: false };
+    });
+    setTiles(enteredTiles);
+  }
+
   const [tiles, setTiles] = useState<TileData[]>(startingTiles);
   const toggleState = (index: number) => {
     const affectedIndices = findAffectedIndices(index);
     const newTiles = tiles.map(tile => {
       if (affectedIndices.has(tile.index)) {
+
         return { ...tile, state: !tile.state };
       }
+
       return tile;
     });
     setTiles(newTiles);
@@ -79,11 +100,6 @@ export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount:
       winGame();
     }
   }, [hasWon, winGame]);
-
-   const autoWin = () => {
-    const newTiles = tiles.map(tile => ({ ...tile, state: false }));
-    setTiles(newTiles);
-  };
 
   return (
     <>
@@ -101,13 +117,16 @@ export const GameBoard = ({ incrementMoveCount, winGame }: { incrementMoveCount:
       {tiles.map((tile) => (
         <Tile
           key={tile.index}
-          number={tile.label}
           state={tile.state}
+          highlighted={tile.highlighted}
+          onMouseEnter={() => {hoverHandler(tile.index)}}
+          onMouseLeave={() => {hoverHandler()}}
           onClick={() => {
+            if (!hasWon) {
               toggleState(tile.index);
               incrementMoveCount();
             }
-          }
+          }}
         />
       ))}
     </div>

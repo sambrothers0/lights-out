@@ -1,4 +1,4 @@
 Lights Out
 This is a project I worked on during my 2026 internship as a JS dev at Viget in which I implemented the classic "Lights Out" puzzle game as a frontend app. Using this project as a medium, I practiced React, Typescript, JS automated testing, and more.
 Jun 2026
-https://github.com/sambrothers0/lights-out
+https://sambrothers0.github.io/lights-out/

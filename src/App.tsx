@@ -17,42 +17,64 @@ function App() {
 
   return (
     <main className="relative min-h-screen overflow-hidden px-6 py-12 text-stone-900 sm:px-10">
-      <p className="mx-auto w-fit rounded-full border border-stone-900/15 bg-gray-200 px-3 py-1 text-lg font-semibold uppercase tracking-[0.18em] text-stone-700">
+      <p className="mx-auto mb-10 text-center w-fit rounded-sm px-4 py-3 text-4xl uppercase tracking-[0.30em] text-amber-200">
         Lights Out
       </p>
 
-      <div className="pointer-events-none absolute inset-x-4 top-20 z-20 flex justify-center sm:inset-x-8 sm:top-24">
-        {isWon && (
-          <div className="w-full max-w-4xl rounded-[2rem] border border-white/40 bg-stone-950/80 px-6 py-10 text-center text-white shadow-[0_30px_80px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:px-10 sm:py-14">
-            <p className="text-5xl font-black uppercase tracking-[0.22em] text-amber-300 sm:text-7xl">
-              You Win
+      {isWon && (
+        <div className="fixed left-1/2 top-1/2 z-20 w-lg max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/40 bg-stone-950/80 px-6 py-10 text-center text-white shadow-[0_30px_80px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:px-10 sm:py-14">
+          <p className="uppercase tracking-[0.22em] text-amber-300 sm:text-5xl">
+            You Win
+          </p>
+          {moveCount == 1 && (
+            <p className="mt-6 text-md text-stone-400 sm:text-lg">
+              Solved in 1 move
             </p>
-            <p className="mt-6 text-xl text-stone-200 sm:text-2xl">
-              It took you {moveCount} tries.
+          )}
+          {moveCount > 1 && (
+            <p className="mt-6 text-md text-stone-400 sm:text-lg">
+            Solved in {moveCount} moves
             </p>
-            <button
-              type="button"
-              className="pointer-events-auto mt-10 rounded-full border border-amber-300/40 bg-amber-300 px-6 py-3 text-base font-semibold text-stone-950 transition hover:scale-[1.02] hover:bg-amber-200"
-              onClick={resetGame}
+          )}
+          <button
+            type="button"
+            className="mt-10 rounded-full border border-amber-300/40 bg-amber-300 px-6 py-3 text-base font-semibold text-stone-950 transition hover:scale-[1.02] hover:bg-amber-300"
+            onClick={resetGame}
             >
-              Restart Game
-            </button>
-          </div>
-        )}
-      </div>
+            Play Again
+          </button>
+        </div>
+      )}
 
-      <section className="relative mx-auto flex h-[70vmin] w-[70vmin] items-center justify-center rounded-3xl border border-stone-900/10 bg-white/70 p-8 backdrop-blur-md sm:p-10">
+      <section className="relative mx-auto flex h-[70vmin] w-[70vmin] items-center justify-center">
         <GameBoard incrementMoveCount={incrementMoveCount} winGame={winGame} key={resetKey}/>
       </section>
 
-      <p className="mt-4 text-center text-sm font-medium uppercase tracking-[0.2em] text-stone-600">
-        Move Count: {moveCount}
+      <p className="mb-4 mt-10 text-center text-sm font-medium uppercase tracking-[0.2em] text-stone-400">
+        Moves - {moveCount}
       </p>
 
-        <p className="mx-auto max-w-2xl text-center text-base text-stone-700 sm:text-lg">
-          A simple implementation of the classic "Lights Out" puzzle game, built with ReactTS and Tailwind CSS.
-        </p>
-        
+      <button 
+        className="block mx-auto w-fit my-5 rounded-full border border-stone-700 px-3 py-1 text-base font-semibold text-stone-300 transition hover:bg-stone-600"
+        onClick={() => {}}
+        >
+        {"Difficulty"}
+      </button> 
+
+      <div className="mx-auto my-12 h-px w-[80vmin] bg-stone-700" />
+      
+      <p className="mx-auto max-w-2xl my-4 text-center text-stone-300 sm:text-md">
+        <a href="https://en.wikipedia.org/wiki/Lights_Out_(game)" className="underline underline-offset-4" target="_blank" rel="noreferrer">Game Info</a>
+        <br />
+        <a href="https://github.com/sambrothers0/lights-out" className="underline underline-offset-4" target="_blank" rel="noreferrer">Code</a>
+        <br />
+        <a href="https://www.youtube.com/watch?v=ffCWa3Cppk4" className="underline underline-offset-4" target="_blank" rel="noreferrer">Solution</a>
+      </p>
+
+      <p className="mx-auto max-w-2xl mt-8 text-center text-sm text-stone-500 sm:text-base">
+        Created by <a href="https://sambrothers0.github.io" className="underline underline-offset-4" target="_blank" rel="noreferrer">Sam Brothers</a>.
+      </p>
+
     </main>
   )
 }
