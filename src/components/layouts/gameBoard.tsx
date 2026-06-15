@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 interface TileData {
   index: number;
   label: number;
-  isFlipped: boolean;
+  isTurnedOn: boolean;
   highlighted: boolean;
   row: number;
   col: number;
@@ -30,7 +30,7 @@ export const GameBoard = ({ incrementMoveCount, difficulty, winGame }:
       COL_NUMS.map((col) => ({
         index: row * BOARD_SIZE + col,
         label: row * BOARD_SIZE + col + 1,
-        isFlipped: Math.random() < 0.5,
+        isTurnedOn: Math.random() < 0.5,
         highlighted: false,
         row,
         col,
@@ -78,7 +78,7 @@ export const GameBoard = ({ incrementMoveCount, difficulty, winGame }:
     
   }
   
-  const hasWon = tiles.every(tile => tile.isFlipped === false);
+  const hasWon = tiles.every(tile => tile.isTurnedOn === false);
   useEffect(() => {
     if (hasWon) {
       winGame();
@@ -90,7 +90,7 @@ export const GameBoard = ({ incrementMoveCount, difficulty, winGame }:
     const newTiles = tiles.map(tile => {
       if (affectedIndices.has(tile.index)) {
         
-        return { ...tile, isFlipped: !tile.isFlipped };
+        return { ...tile, isTurnedOn: !tile.isTurnedOn };
       }
       
       return tile;
@@ -102,7 +102,7 @@ export const GameBoard = ({ incrementMoveCount, difficulty, winGame }:
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'w' || e.key === 'W') {
-        setTiles(prev => prev.map(tile => ({ ...tile, isFlipped: false })));
+        setTiles(prev => prev.map(tile => ({ ...tile, isTurnedOn: false })));
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -124,7 +124,7 @@ export const GameBoard = ({ incrementMoveCount, difficulty, winGame }:
         return (
         <Tile
           key={tile.index}
-          isFlipped={tile.isFlipped}
+          isTurnedOn={tile.isTurnedOn}
           highlighted={!hasWon && tile.highlighted}
           animationDelay={animationDelay}
           onMouseEnter={() => {handleHover(tile.index)}}
