@@ -1,11 +1,35 @@
 import Tile, { type TileProps } from "@/components/ui/Tile";
-import parseBoard from "@/util/boardParser";
-import generateSolvableBoard from "@/util/solvableBoardGenerator";
+import { generateSolvableBoard } from "@/util/solvableBoardGenerator";
+import { parseBoard } from "@/util/boardParser";
+import { solveBoard } from "@/util/boardSolver";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from 'motion/react';
 
+function initializeBoard(n: number): TileProps[] {
+  const layout = generateSolvableBoard(n);
+  const tiles: TileProps[] = [];
+  for (let row = 0; row < n; row++) {
+    for (let col = 0; col < n; col++) {
+      tiles.push({
+        index: row * n + col,
+        isTurnedOn: layout[row][col] === 1,
+        highlighted: false,
+        suggested: false,
+        row,
+        col,
+        animationDelay: 0,
+        onMouseEnter: () => {},
+        onMouseLeave: () => {},
+        onClick: () => {},
+      });
+    }
+  }
+  return tiles;
+}
+
 export const GameBoard = () => {
   type Difficulty = 'Easy' | 'Normal' | 'Hard';
+  const startingDifficulty: Difficulty = 'Normal';
 
   const BOARD_SIZES: Record<Difficulty, number> = {
     'Easy': 4,
@@ -13,10 +37,16 @@ export const GameBoard = () => {
     'Hard': 7,
   };
   
+  const BOARD_SIZE = BOARD_SIZES[startingDifficulty];
+
   const [moveCount, setMoveCount] = useState(0);
   const [resetKey, setResetKey] = useState(0);
+  const [difficulty, setDifficulty] = useState<Difficulty>(startingDifficulty);
+  const [tiles, setTiles] = useState<TileProps[]>(() => initializeBoard(BOARD_SIZE));
+  const [solutionShown, setSolutionShown] = useState(false);
+  const [hintShown, setHintShown] = useState(false);
+  const [hasWon, setHasWon] = useState(false);
 
-  const [difficulty, setDifficulty] = useState<Difficulty>('Normal');
   const changeDifficulty = () => {
     const nextDifficulty: Difficulty =
       difficulty === 'Easy' ? 'Normal' : difficulty === 'Normal' ? 'Hard' : 'Easy';
@@ -26,30 +56,7 @@ export const GameBoard = () => {
     setMoveCount(0);
   };
 
-  function initializeBoard(n: number): TileProps[] {
-    const layout = generateSolvableBoard(n);
-    const tiles: TileProps[] = [];
-    for (let row = 0; row < n; row++) {
-      for (let col = 0; col < n; col++) {
-        tiles.push({
-          index: row * n + col,
-          isTurnedOn: layout[row][col] === 1,
-          highlighted: false,
-          suggested: false,
-          row,
-          col,
-          animationDelay: 0,
-          onMouseEnter: () => {},
-          onMouseLeave: () => {},
-          onClick: () => {},
-        });
-      }
-    }
-    return tiles;
-  }
 
-  const [tiles, setTiles] = useState<TileProps[]>(() => initializeBoard(BOARD_SIZES[difficulty]));
-  const BOARD_SIZE = Math.round(Math.sqrt(tiles.length));
   
   // for clicking and highlighting
   const findAffectedIndices = (index: number): Set<number> => {
@@ -80,33 +87,73 @@ export const GameBoard = () => {
       return;
     }
     const affectedIndices = findAffectedIndices(index);
-    const enteredTiles = tiles.map(tile => {
-      if (affectedIndices.has(tile.index)) {
-        return { ...tile, highlighted: true };
-      }
-      return { ...tile, highlighted: false };
-    });
+    const enteredTiles = tiles.map(tile => ({
+      ...tile,
+      highlighted: affectedIndices.has(tile.index)
+    }));
     setTiles(enteredTiles);
-    
   }
 
-  const giveHint = () => {}
-
-  const showSolution = () => {}
-
-  const [hasWon, setHasWon] = useState(false);
+  const handleClick = (index: number) => {
+    if (!hasWon) {
+      const affectedIndices = findAffectedIndices(index);
+      const toggledTiles = tiles.map(tile => ({
+        ...tile,
+        isTurnedOn: affectedIndices.has(tile.index) ? !tile.isTurnedOn : tile.isTurnedOn,
+      }));
+      const suggestedIndices = solutionShown
+        ? getSuggestedTileIndices(toggledTiles)
+        : new Set<number>();
+      const newTiles = toggledTiles.map(tile => ({
+        ...tile,
+        suggested: suggestedIndices.has(tile.index),
+      }));
+      setTiles(newTiles);
+      setMoveCount(prev => prev + 1);
+      if (newTiles.every(tile => !tile.isTurnedOn)) {
+        winGame();
+      }
+    }
+  }
+  
+  const toggleHint = () => {
+    setHintShown(!hintShown);
+  }
+  
+  const getSuggestedTileIndices = (boardTiles: TileProps[] = tiles): Set<number> => {
+    const solution = solveBoard(parseBoard(boardTiles));
+    const indices = new Set<number>();
+    solution.forEach(move => {
+      const index = move.r * BOARD_SIZE + move.c;
+      indices.add(index);
+    });
+    return indices;
+  };
+  
+  const toggleSolution = () => {
+    const nextShown = !solutionShown;
+    setSolutionShown(nextShown);
+    if (nextShown) {
+      const suggestedIndices = getSuggestedTileIndices();
+      setTiles(prev => prev.map(tile => ({
+        ...tile,
+        suggested: suggestedIndices.has(tile.index)
+      })));
+    }
+    else {
+      setTiles(prev => prev.map(tile => ({
+        ...tile,
+        suggested: false
+      })));
+    }
+  }
+  
   const winGame = () => {
     setTimeout(() => {
       setHasWon(true);
     }, 500);
   }
-  
-  useEffect(() => {
-    if (tiles.every(tile => !tile.isTurnedOn)) {
-      winGame();
-    }
-  }, [tiles, hasWon]);
-  
+
   useEffect(() => {
     document.body.style.overflow = hasWon ? 'hidden' : '';
     if (!hasWon) return;
@@ -125,24 +172,13 @@ export const GameBoard = () => {
       setMoveCount(0);
     }, 300);
   }
-
-  const toggleState = (index: number) => {
-    const affectedIndices = findAffectedIndices(index);
-    const newTiles = tiles.map(tile => {
-      if (affectedIndices.has(tile.index)) {
-        
-        return { ...tile, isTurnedOn: !tile.isTurnedOn };
-      }
-      return tile;
-    });
-    setTiles(newTiles);
-  };
   
   // DEBUG: press 'w' to auto win. this could also just be an easter egg for the user
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'w' || e.key === 'W') {
         setTiles(prev => prev.map(tile => ({ ...tile, isTurnedOn: false })));
+        winGame();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -204,18 +240,13 @@ export const GameBoard = () => {
                   index={tile.index}
                   isTurnedOn={tile.isTurnedOn}
                   highlighted={!hasWon && tile.highlighted}
-                  suggested={false}
+                  suggested={(hintShown || solutionShown) && tile.suggested}
                   row={tile.row}
                   col={tile.col}
                   animationDelay={animationDelay}
                   onMouseEnter={() => {handleHover(tile.index)}}
                   onMouseLeave={() => {handleHover()}}
-                  onClick={() => {
-                    if (!hasWon) {
-                      toggleState(tile.index);
-                      setMoveCount(prev => prev + 1);
-                    }
-                  }}
+                  onClick={() => {handleClick(tile.index)}}
                 ></Tile>
               );
             })}
@@ -224,6 +255,10 @@ export const GameBoard = () => {
         
         <p className="mb-4 mt-10 text-center text-sm font-medium uppercase tracking-[0.2em] text-stone-400">
           Moves - {moveCount}
+        </p>
+
+        <p className="mb-2 mt-2 text-center text-sm text-stone-400">
+          Try to turn off all the lights in as few moves as possible!
         </p>
 
         <div className="flex items-center justify-center gap-4 my-5">
@@ -237,16 +272,23 @@ export const GameBoard = () => {
           <button
             className={`w-fit rounded-full border border-stone-700 px-3 py-1 text-base font-semibold text-stone-300 transition ${!hasWon && 'hover:bg-stone-600'}`}
             disabled={hasWon}
-            onClick={giveHint}
+            onClick={resetGame}
           >
-            Hint
+            Reset
           </button>
           <button
             className={`w-fit rounded-full border border-stone-700 px-3 py-1 text-base font-semibold text-stone-300 transition ${!hasWon && 'hover:bg-stone-600'}`}
             disabled={hasWon}
-            onClick={showSolution}
+            onClick={toggleHint}
           >
-            Solution
+            {hintShown ? 'Hide Hint' : 'Hint'}
+          </button>
+          <button
+            className={`w-fit rounded-full border border-stone-700 px-3 py-1 text-base font-semibold text-stone-300 transition ${!hasWon && 'hover:bg-stone-600'}`}
+            disabled={hasWon}
+            onClick={toggleSolution}
+          >
+            {solutionShown ? 'Hide Solution' : 'Solution'}
           </button>
         </div>
       </div>

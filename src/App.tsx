@@ -16,7 +16,7 @@ function App() {
         </AnimatePresence>
       </section>
 
-      <div className="mx-auto my-12 h-px w-[80vmin] bg-stone-700" />
+      <div className="mx-auto mb-12 mt-7 h-px w-[80vmin] bg-stone-700" />
       
       <p className="mx-auto max-w-2xl my-4 text-center text-stone-300 sm:text-md">
         <a href="https://en.wikipedia.org/wiki/Lights_Out_(game)" 
