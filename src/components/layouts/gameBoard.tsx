@@ -221,6 +221,7 @@ export const GameBoard = () => {
         <AnimatePresence mode="wait">
           <div
             key={resetKey}
+            data-testid="game-board"
             className="grid gap-1 h-[70vmin] w-[70vmin] overflow-hidden"
             style={{
               gridTemplateColumns: `repeat(${boardSize}, minmax(0, 1fr))`,

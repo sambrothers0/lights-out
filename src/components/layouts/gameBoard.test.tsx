@@ -12,3 +12,16 @@
     - disables hovering and clicking on the gameboard
 
 */
+
+import { render, screen } from "@testing-library/react";
+import GameBoard from "./gameBoard";
+
+beforeEach(() => {
+  render(<GameBoard />);
+});
+
+describe("GameBoard", () => {
+  it("renders the game board in the DOM", () => {
+    expect(screen.getByTestId("game-board")).toBeInTheDocument();
+  });
+});

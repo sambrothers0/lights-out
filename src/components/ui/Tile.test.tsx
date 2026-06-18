@@ -15,3 +15,9 @@
 - tile calls the onClick handler when the tile is clicked, this handler toggles the state and changes the background color
  onMouseLeave, and onClick handlers when the respective events occur
 */
+
+describe("Tile", () => {
+  it.todo("renders with the correct colors based on isTurnedOn");
+  it.todo("applies the highlighted class when highlighted is true");
+  it.todo("calls onMouseEnter / onMouseLeave / onClick handlers");
+});
