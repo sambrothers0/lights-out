@@ -14,14 +14,47 @@
 */
 
 import { render, screen } from "@testing-library/react";
-import GameBoard from "./gameBoard";
+import userEvent from "@testing-library/user-event";
+import GameBoard, { boardSizes } from "./gameBoard";
+import ParseBoard from "@/util/parseBoard";
 
-beforeEach(() => {
-  render(<GameBoard />);
-});
+const setup = () => {
+  render(<GameBoard/>);
+};
+
+const tileCount = (difficulty: keyof typeof boardSizes) =>
+  boardSizes[difficulty] ** 2;
 
 describe("GameBoard", () => {
   it("renders the game board in the DOM", () => {
+    setup();
     expect(screen.getByTestId("game-board")).toBeInTheDocument();
   });
-});
+
+  it(`difficulty button renders with the correct text,
+    pressing it changes the board size and resets a new board`, () => {
+    setup();
+    const user = userEvent.setup();
+
+    expect(screen.getByTestId(/difficulty/i)).toHaveTextContent(/normal/i);
+    expect(screen.getAllByTestId("tile")).toHaveLength(tileCount("Normal"));
+
+    user.click(screen.getByTestId(/difficulty/i));
+    expect(screen.getByTestId(/difficulty/i)).toHaveTextContent(/hard/i);
+    expect(screen.getAllByTestId("tile")).toHaveLength(tileCount("Hard"));
+
+    user.click(screen.getByTestId(/difficulty/i));
+    expect(screen.getByTestId(/difficulty/i)).toHaveTextContent(/easy/i);
+    expect(screen.getAllByTestId("tile")).toHaveLength(tileCount("Easy"));
+
+    // check that a full cycle returns to the original state
+    user.click(screen.getByTestId(/difficulty/i));
+    expect(screen.getByTestId(/difficulty/i)).toHaveTextContent(/normal/i);
+    expect(screen.getAllByTestId("tile")).toHaveLength(tileCount("Normal"));
+  });
+
+  // it(`reset button renders with the correct text
+  //   pressing it resets the board to a new random state`, () => {
+    
+  // })
+})

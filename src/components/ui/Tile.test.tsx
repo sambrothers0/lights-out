@@ -56,10 +56,6 @@ const setup = (props = {}) => {
 };
 
 describe("Tile", () => {
-  it.todo("renders with the correct colors based on isTurnedOn");
-  it.todo("applies the highlighted class when highlighted is true");
-  it.todo("calls onMouseEnter / onMouseLeave / onClick handlers");
-
 	it('renders with no highlight by default', () => {
 		setup();
 		const tile = screen.getByRole('button');

@@ -1,47 +1,30 @@
 import Tile, { type TileProps } from "@/components/ui/Tile";
-import { generateSolvableBoard } from "@/util/solvableBoardGenerator";
-import { parseBoard } from "@/util/boardParser";
-import { solveBoard } from "@/util/boardSolver";
+import { generateSolvableBoard } from "@/util/generateSolvableBoard";
+import { solveBoard } from "@/util/solveBoard";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from 'motion/react';
 
-function initializeBoard(n: number): TileProps[] {
-  const layout = generateSolvableBoard(n);
-  const tiles: TileProps[] = [];
-  for (let row = 0; row < n; row++) {
-    for (let col = 0; col < n; col++) {
-      tiles.push({
-        index: row * n + col,
-        isTurnedOn: layout[row][col] === 1,
-        highlighted: false,
-        suggested: false,
-        row,
-        col,
-        animationDelay: 0,
-        onMouseEnter: () => {},
-        onMouseLeave: () => {},
-        onClick: () => {},
-      });
-    }
-  }
-  return tiles;
-}
+// A stable string fingerprint of the board's on/off pattern, used to compare boards.
+const boardKey = (tiles: TileProps[]): string =>
+  tiles.map(tile => (tile.isTurnedOn ? "1" : "0")).join("");
+
+export type Difficulty = 'Easy' | 'Normal' | 'Hard';
+
+export const boardSizes: Record<Difficulty, number> = {
+  'Easy': 4,
+  'Normal': 5,
+  'Hard': 7,
+};
+
+export const startingDifficulty: Difficulty = 'Normal';
 
 export const GameBoard = () => {
-  type Difficulty = 'Easy' | 'Normal' | 'Hard';
-  const startingDifficulty: Difficulty = 'Normal';
-
-  const boardSizes: Record<Difficulty, number> = {
-    'Easy': 4,
-    'Normal': 5,
-    'Hard': 7,
-  };
-  
+  const [previousBoard, setPreviousBoard] = useState<TileProps[]>();
   const [boardSize, setBoardSize] = useState(boardSizes[startingDifficulty]);
   const [moveCount, setMoveCount] = useState(0);
   const [resetKey, setResetKey] = useState(0);
   const [difficulty, setDifficulty] = useState<Difficulty>(startingDifficulty);
-  const [tiles, setTiles] = useState<TileProps[]>(() => initializeBoard(boardSize));
+  const [tiles, setTiles] = useState<TileProps[]>(() => generateSolvableBoard(boardSize));
   const [solutionShown, setSolutionShown] = useState(false);
   const [hasWon, setHasWon] = useState(false);
 
@@ -50,7 +33,7 @@ export const GameBoard = () => {
       difficulty === 'Easy' ? 'Normal' : difficulty === 'Normal' ? 'Hard' : 'Easy';
     setDifficulty(nextDifficulty);
     setBoardSize(boardSizes[nextDifficulty]);
-    setTiles(initializeBoard(boardSizes[nextDifficulty]));
+    setTiles(generateSolvableBoard(boardSizes[nextDifficulty]));
     setSolutionShown(false);
     setResetKey(prev => prev + 1);
     setMoveCount(0);
@@ -115,7 +98,7 @@ export const GameBoard = () => {
   }
   
   const getSuggestedTileIndices = (boardTiles: TileProps[] = tiles): Set<number> => {
-    const solution = solveBoard(parseBoard(boardTiles));
+    const solution = solveBoard(boardTiles);
     const indices = new Set<number>();
     solution.forEach(move => {
       const index = move.r * boardSize + move.c;
@@ -160,15 +143,19 @@ export const GameBoard = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [hasWon]);
 
-  const resetGame = () => {
-    setHasWon(false);
-    setTiles(initializeBoard(boardSize));
-    setResetKey(prev => prev + 1);
-    setSolutionShown(false);
-    setTimeout(() => {
-      setMoveCount(0);
-    }, 300);
+const resetGame = () => {
+  let newTiles = generateSolvableBoard(boardSize);
+  while (previousBoard && (boardKey(newTiles) === boardKey(previousBoard))) {
+    newTiles = generateSolvableBoard(boardSize);
   }
+  setPreviousBoard(newTiles);
+  setTiles(newTiles);
+  setHasWon(false);
+  setResetKey(prev => prev + 1);
+  setSolutionShown(false);
+  setTimeout(() => setMoveCount(0), 300);
+};
+
   
   // DEBUG: press 'w' to auto win. this could also just be an easter egg for the user
   useEffect(() => {
@@ -263,6 +250,7 @@ export const GameBoard = () => {
           <button
             className={`w-fit rounded-full border border-stone-700 px-3 py-1 text-base font-semibold text-stone-300 transition ${!hasWon && 'hover:bg-stone-600'}`}
             disabled={hasWon}
+            data-testid="difficulty-button"
             onClick={changeDifficulty}
           >
             {difficulty}
@@ -270,6 +258,7 @@ export const GameBoard = () => {
           <button
             className={`w-fit rounded-full border border-stone-700 px-3 py-1 text-base font-semibold text-stone-300 transition ${!hasWon && 'hover:bg-stone-600'}`}
             disabled={hasWon}
+            data-testid="reset-button"
             onClick={resetGame}
           >
             Reset
@@ -277,6 +266,7 @@ export const GameBoard = () => {
           <button
             className={`w-fit rounded-full border border-stone-700 px-3 py-1 text-base font-semibold text-stone-300 transition ${!hasWon && 'hover:bg-stone-600'}`}
             disabled={hasWon}
+            data-testid="solution-button"
             onClick={toggleSolution}
           >
             {solutionShown ? 'Hide Solution' : 'Solution'}

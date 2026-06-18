@@ -1,3 +1,5 @@
+import { type TileProps } from '@/components/ui/Tile';
+
 export interface Move {
   r: number;
   c: number;
@@ -96,10 +98,17 @@ const minWeightSolution = (
  * every tile in the set once, in any order, turns all lights off. An empty set
  * means the board has no solution or is already solved (zero presses is minimal).
  */
-export const solveBoard = (board: number[][]): Set<Move> => {
-  const size = board.length;
+export const solveBoard = (board: TileProps[]): Set<Move> => {
+  const size = Math.round(Math.sqrt(board.length));
   const cells = size * size;
   const index = (r: number, c: number): number => r * size + c;
+
+  // Flatten the tiles into a row-major 0/1 state vector (the `b` column),
+  // placing each tile by its own row/col so array order doesn't matter.
+  const state = new Array<number>(cells).fill(0);
+  for (const tile of board) {
+    state[index(tile.row, tile.col)] = tile.isTurnedOn ? 1 : 0;
+  }
 
   // Build the augmented matrix [A | b]. Row `i` is the equation for cell `i`:
   // a button toggles cell `i` if it is that cell or one of its neighbors.
@@ -115,7 +124,7 @@ export const solveBoard = (board: number[][]): Set<Move> => {
       if (r < size - 1) matrix[i][index(r + 1, c)] = 1;
       if (c > 0) matrix[i][index(r, c - 1)] = 1;
       if (c < size - 1) matrix[i][index(r, c + 1)] = 1;
-      matrix[i][cells] = board[r][c]; // current state forms the b column
+      matrix[i][cells] = state[i]; // current state forms the b column
     }
   }
 
