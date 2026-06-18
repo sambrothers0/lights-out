@@ -42,7 +42,6 @@ export const GameBoard = () => {
   const [resetKey, setResetKey] = useState(0);
   const [difficulty, setDifficulty] = useState<Difficulty>(startingDifficulty);
   const [tiles, setTiles] = useState<TileProps[]>(() => initializeBoard(boardSize));
-  const [hintShown, setHintShown] = useState(false);
   const [solutionShown, setSolutionShown] = useState(false);
   const [hasWon, setHasWon] = useState(false);
 
@@ -52,7 +51,6 @@ export const GameBoard = () => {
     setDifficulty(nextDifficulty);
     setBoardSize(boardSizes[nextDifficulty]);
     setTiles(initializeBoard(boardSizes[nextDifficulty]));
-    setHintShown(false);
     setSolutionShown(false);
     setResetKey(prev => prev + 1);
     setMoveCount(0);
@@ -127,32 +125,19 @@ export const GameBoard = () => {
   };
 
   useEffect(() => {
-    if (!hintShown && !solutionShown) {
+    if (!solutionShown) {
       setTiles(prev => prev.map(tile => ({
         ...tile,
         suggested: false
       }))); 
     }
-    else if (solutionShown) {
+    else {
       const suggestedIndices = getSuggestedTileIndices();
       setTiles(prev => prev.map(tile => ({
         ...tile,
         suggested: suggestedIndices.has(tile.index)
       })));
-    }
-    else if (hintShown) {
-      const suggestedIndices = [...getSuggestedTileIndices()];
-      const suggestedIndex = suggestedIndices[Math.floor(Math.random() * suggestedIndices.length)];
-      setTiles(prev => prev.map(tile => ({
-        ...tile,
-        suggested: tile.index === suggestedIndex
-      })));
-    }}, [hintShown, solutionShown]);
-
-  const toggleHint = () => {
-    const nextShown = !hintShown;
-    setHintShown(nextShown);
-  }
+    }}, [solutionShown]);
 
   const toggleSolution = () => {
     const nextShown = !solutionShown;
@@ -179,7 +164,6 @@ export const GameBoard = () => {
     setHasWon(false);
     setTiles(initializeBoard(boardSize));
     setResetKey(prev => prev + 1);
-    setHintShown(false);
     setSolutionShown(false);
     setTimeout(() => {
       setMoveCount(0);
@@ -253,7 +237,7 @@ export const GameBoard = () => {
                   index={tile.index}
                   isTurnedOn={tile.isTurnedOn}
                   highlighted={!hasWon && tile.highlighted}
-                  suggested={(hintShown || solutionShown) && tile.suggested}
+                  suggested={solutionShown && tile.suggested}
                   row={tile.row}
                   col={tile.col}
                   animationDelay={animationDelay}
@@ -288,13 +272,6 @@ export const GameBoard = () => {
             onClick={resetGame}
           >
             Reset
-          </button>
-          <button
-            className={`w-fit rounded-full border border-stone-700 px-3 py-1 text-base font-semibold text-stone-300 transition ${!hasWon && 'hover:bg-stone-600'}`}
-            disabled={hasWon}
-            onClick={toggleHint}
-          >
-            {hintShown ? 'Hide Hint' : 'Hint'}
           </button>
           <button
             className={`w-fit rounded-full border border-stone-700 px-3 py-1 text-base font-semibold text-stone-300 transition ${!hasWon && 'hover:bg-stone-600'}`}

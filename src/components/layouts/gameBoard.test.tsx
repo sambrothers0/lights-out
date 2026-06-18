@@ -10,4 +10,5 @@
 - winning the game does the following:
     - triggers the win state in the parent component
     - disables hovering and clicking on the gameboard
+
 */
