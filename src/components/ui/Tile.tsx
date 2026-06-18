@@ -26,7 +26,7 @@ export const Tile: React.FC<TileProps> = ({ isTurnedOn, className = '', highligh
         'flex w-full aspect-square items-center justify-center rounded-sm text-xl font-semibold transition-[background-color]',
         isTurnedOn ? 'bg-amber-300 text-amber-950' : 'bg-stone-700 text-stone-100',
         'border-[0.6vmin]',
-        suggested ? 'border-red-500' : highlighted ? 'border-white' : 'border-transparent',
+        highlighted ? 'border-white' : 'border-transparent',
         className
       )}
       initial={{ x: 100, opacity: 0, rotateY: isTurnedOn ? 180 : 0 }}
@@ -38,7 +38,7 @@ export const Tile: React.FC<TileProps> = ({ isTurnedOn, className = '', highligh
         opacity: { duration: 0.15, ease: 'easeInOut', delay: animationDelay },
       }}
     >
-      {/* {index + 1} */}
+      {suggested && <span className="block w-[25%] aspect-square rounded-full bg-red-500" />}
     </motion.button>
   );
 };

@@ -256,7 +256,7 @@ export const GameBoard = () => {
         </p>
 
         <p className="mb-2 mt-2 text-center text-sm text-stone-400">
-          Try to turn off all the lights in as few moves as possible!
+          Turn off all the lights in as few moves as possible!
         </p>
 
         <div className="flex items-center justify-center gap-4 my-5">
