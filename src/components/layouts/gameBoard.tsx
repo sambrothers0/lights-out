@@ -31,33 +31,33 @@ export const GameBoard = () => {
   type Difficulty = 'Easy' | 'Normal' | 'Hard';
   const startingDifficulty: Difficulty = 'Normal';
 
-  const BOARD_SIZES: Record<Difficulty, number> = {
+  const boardSizes: Record<Difficulty, number> = {
     'Easy': 4,
     'Normal': 5,
     'Hard': 7,
   };
   
-  const BOARD_SIZE = BOARD_SIZES[startingDifficulty];
-
+  const [boardSize, setBoardSize] = useState(boardSizes[startingDifficulty]);
   const [moveCount, setMoveCount] = useState(0);
   const [resetKey, setResetKey] = useState(0);
   const [difficulty, setDifficulty] = useState<Difficulty>(startingDifficulty);
-  const [tiles, setTiles] = useState<TileProps[]>(() => initializeBoard(BOARD_SIZE));
-  const [solutionShown, setSolutionShown] = useState(false);
+  const [tiles, setTiles] = useState<TileProps[]>(() => initializeBoard(boardSize));
   const [hintShown, setHintShown] = useState(false);
+  const [solutionShown, setSolutionShown] = useState(false);
   const [hasWon, setHasWon] = useState(false);
 
   const changeDifficulty = () => {
     const nextDifficulty: Difficulty =
       difficulty === 'Easy' ? 'Normal' : difficulty === 'Normal' ? 'Hard' : 'Easy';
     setDifficulty(nextDifficulty);
-    setTiles(initializeBoard(BOARD_SIZES[nextDifficulty]));
+    setBoardSize(boardSizes[nextDifficulty]);
+    setTiles(initializeBoard(boardSizes[nextDifficulty]));
+    setHintShown(false);
+    setSolutionShown(false);
     setResetKey(prev => prev + 1);
     setMoveCount(0);
   };
 
-
-  
   // for clicking and highlighting
   const findAffectedIndices = (index: number): Set<number> => {
     const affectedIndices = new Set<number>();
@@ -66,15 +66,15 @@ export const GameBoard = () => {
     const tile = tiles.find(tile => tile.index === index);
     if (!tile) return affectedIndices;
     if (tile.row > 0) {
-      affectedIndices.add(tile.index - BOARD_SIZE);
+      affectedIndices.add(tile.index - boardSize);
     }
-    if (tile.row < BOARD_SIZE - 1) {
-      affectedIndices.add(tile.index + BOARD_SIZE);
+    if (tile.row < boardSize - 1) {
+      affectedIndices.add(tile.index + boardSize);
     }
     if (tile.col > 0) {
       affectedIndices.add(tile.index - 1);
     }
-    if (tile.col < BOARD_SIZE - 1) {
+    if (tile.col < boardSize - 1) {
       affectedIndices.add(tile.index + 1);
     }
     return affectedIndices;
@@ -116,36 +116,47 @@ export const GameBoard = () => {
     }
   }
   
-  const toggleHint = () => {
-    setHintShown(!hintShown);
-  }
-  
   const getSuggestedTileIndices = (boardTiles: TileProps[] = tiles): Set<number> => {
     const solution = solveBoard(parseBoard(boardTiles));
     const indices = new Set<number>();
     solution.forEach(move => {
-      const index = move.r * BOARD_SIZE + move.c;
+      const index = move.r * boardSize + move.c;
       indices.add(index);
     });
     return indices;
   };
-  
-  const toggleSolution = () => {
-    const nextShown = !solutionShown;
-    setSolutionShown(nextShown);
-    if (nextShown) {
+
+  useEffect(() => {
+    if (!hintShown && !solutionShown) {
+      setTiles(prev => prev.map(tile => ({
+        ...tile,
+        suggested: false
+      }))); 
+    }
+    else if (solutionShown) {
       const suggestedIndices = getSuggestedTileIndices();
       setTiles(prev => prev.map(tile => ({
         ...tile,
         suggested: suggestedIndices.has(tile.index)
       })));
     }
-    else {
+    else if (hintShown) {
+      const suggestedIndices = [...getSuggestedTileIndices()];
+      const suggestedIndex = suggestedIndices[Math.floor(Math.random() * suggestedIndices.length)];
       setTiles(prev => prev.map(tile => ({
         ...tile,
-        suggested: false
+        suggested: tile.index === suggestedIndex
       })));
-    }
+    }}, [hintShown, solutionShown]);
+
+  const toggleHint = () => {
+    const nextShown = !hintShown;
+    setHintShown(nextShown);
+  }
+
+  const toggleSolution = () => {
+    const nextShown = !solutionShown;
+    setSolutionShown(nextShown);
   }
   
   const winGame = () => {
@@ -166,8 +177,10 @@ export const GameBoard = () => {
 
   const resetGame = () => {
     setHasWon(false);
-    setTiles(initializeBoard(BOARD_SIZE));
+    setTiles(initializeBoard(boardSize));
     setResetKey(prev => prev + 1);
+    setHintShown(false);
+    setSolutionShown(false);
     setTimeout(() => {
       setMoveCount(0);
     }, 300);
@@ -226,13 +239,13 @@ export const GameBoard = () => {
             key={resetKey}
             className="grid gap-1 h-[70vmin] w-[70vmin] overflow-hidden"
             style={{
-              gridTemplateColumns: `repeat(${BOARD_SIZE}, minmax(0, 1fr))`,
-              gridTemplateRows: `repeat(${BOARD_SIZE}, minmax(0, 1fr))`,
+              gridTemplateColumns: `repeat(${boardSize}, minmax(0, 1fr))`,
+              gridTemplateRows: `repeat(${boardSize}, minmax(0, 1fr))`,
             }}
           >
             {tiles.map((tile) => {
-              const totalTiles = BOARD_SIZE * BOARD_SIZE;
-              const columnMajorOrder = tile.col * BOARD_SIZE + tile.row;
+              const totalTiles = boardSize * boardSize;
+              const columnMajorOrder = tile.col * boardSize + tile.row;
               const animationDelay = (columnMajorOrder / (totalTiles - 1)) * 0.2;
               return (
                 <Tile
