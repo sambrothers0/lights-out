@@ -20,6 +20,9 @@ export const Tile: React.FC<TileProps> = ({ isTurnedOn, className = '', highligh
     <motion.button
       type="button"
       data-testid="tile"
+      data-lit={isTurnedOn}
+      data-highlighted={highlighted}
+      data-suggested={suggested}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onClick={onClick}

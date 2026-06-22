@@ -3,27 +3,14 @@ import { generateSolvableBoard } from "@/util/generateSolvableBoard";
 import { solveBoard } from "@/util/solveBoard";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from 'motion/react';
-
-// A stable string fingerprint of the board's on/off pattern, used to compare boards.
-const boardKey = (tiles: TileProps[]): string =>
-  tiles.map(tile => (tile.isTurnedOn ? "1" : "0")).join("");
-
-export type Difficulty = 'Easy' | 'Normal' | 'Hard';
-
-export const boardSizes: Record<Difficulty, number> = {
-  'Easy': 4,
-  'Normal': 5,
-  'Hard': 7,
-};
-
-export const startingDifficulty: Difficulty = 'Normal';
+import { boardKey, BOARD_SIZES, type Difficulty, WIN_SCREEN_DELAY, RESET_GAME_DELAY, STARTING_DIFFICULTY } from "@/constants";
 
 export const GameBoard = () => {
   const [previousBoard, setPreviousBoard] = useState<TileProps[]>();
-  const [boardSize, setBoardSize] = useState(boardSizes[startingDifficulty]);
+  const [boardSize, setBoardSize] = useState(BOARD_SIZES[STARTING_DIFFICULTY]);
   const [moveCount, setMoveCount] = useState(0);
   const [resetKey, setResetKey] = useState(0);
-  const [difficulty, setDifficulty] = useState<Difficulty>(startingDifficulty);
+  const [difficulty, setDifficulty] = useState<Difficulty>(STARTING_DIFFICULTY);
   const [tiles, setTiles] = useState<TileProps[]>(() => generateSolvableBoard(boardSize));
   const [solutionShown, setSolutionShown] = useState(false);
   const [hasWon, setHasWon] = useState(false);
@@ -32,8 +19,8 @@ export const GameBoard = () => {
     const nextDifficulty: Difficulty =
       difficulty === 'Easy' ? 'Normal' : difficulty === 'Normal' ? 'Hard' : 'Easy';
     setDifficulty(nextDifficulty);
-    setBoardSize(boardSizes[nextDifficulty]);
-    setTiles(generateSolvableBoard(boardSizes[nextDifficulty]));
+    setBoardSize(BOARD_SIZES[nextDifficulty]);
+    setTiles(generateSolvableBoard(BOARD_SIZES[nextDifficulty]));
     setSolutionShown(false);
     setResetKey(prev => prev + 1);
     setMoveCount(0);
@@ -130,7 +117,7 @@ export const GameBoard = () => {
   const winGame = () => {
     setTimeout(() => {
       setHasWon(true);
-    }, 500);
+    }, WIN_SCREEN_DELAY);
   }
 
   useEffect(() => {
@@ -153,7 +140,7 @@ const resetGame = () => {
   setHasWon(false);
   setResetKey(prev => prev + 1);
   setSolutionShown(false);
-  setTimeout(() => setMoveCount(0), 300);
+  setTimeout(() => setMoveCount(0), RESET_GAME_DELAY);
 };
 
   
@@ -194,7 +181,7 @@ const resetGame = () => {
               </p>
               <button
                 type="button"
-                className="mt-10 rounded-full border border-amber-300/40 bg-amber-300 px-6 py-3 text-base font-semibold text-stone-950 transition hover:scale-[1.02] hover:bg-amber-300 focus:outline-none"
+                className="mt-10 rounded-full border border-amber-300/40 px-6 py-3 text-base font-semibold text-stone-950 transition hover:scale-[1.02] hover:bg-amber-300 focus:outline-none"
                 onClick={resetGame}
               >
                 Play Again
@@ -238,7 +225,7 @@ const resetGame = () => {
           </div>
         </AnimatePresence>
         
-        <p className="mb-4 mt-10 text-center text-sm font-medium uppercase tracking-[0.2em] text-stone-400">
+        <p data-testid="move-count" className="mb-4 mt-10 text-center text-sm font-medium uppercase tracking-[0.2em] text-stone-400">
           Moves - {moveCount}
         </p>
 
