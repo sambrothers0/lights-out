@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from 'motion/react';
 import { boardKey, BOARD_SIZES, type Difficulty, WIN_SCREEN_DELAY, RESET_GAME_DELAY, STARTING_DIFFICULTY } from "@/constants";
 
-export const GameBoard = () => {
+export const GameBoard = ({ motionDisabled = false }: { motionDisabled?: boolean }) => {
   const [previousBoard, setPreviousBoard] = useState<TileProps[]>();
   const [boardSize, setBoardSize] = useState(BOARD_SIZES[STARTING_DIFFICULTY]);
   const [moveCount, setMoveCount] = useState(0);
@@ -216,6 +216,7 @@ const resetGame = () => {
                   row={tile.row}
                   col={tile.col}
                   animationDelay={animationDelay}
+                  reduceMotion={motionDisabled}
                   onMouseEnter={() => {handleHover(tile.index)}}
                   onMouseLeave={() => {handleHover()}}
                   onClick={() => {handleClick(tile.index)}}

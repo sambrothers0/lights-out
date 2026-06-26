@@ -1,22 +1,3 @@
-/*
-- each tile has the following properties:
-  isTurnedOn: boolean;
-  number?: number;
-  className?: string;
-  highlighted: boolean;
-  animationDelay: number;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
-  onClick: () => void;
-- tile renders with the correct background color and text color based on the isTurnedOn property
-- tile applies the highlighted class when the highlighted property is true
-- tile calls the onMouseEnter handler and the css property updates correctly when the mouse enters the tile
-- tile calls the onMouseLeave handler and the css property updates correctly when the mouse leaves the tile
-- tile calls the onClick handler when the tile is clicked, this handler toggles the state and changes the background color
- onMouseLeave, and onClick handlers when the respective events occur
-*/
-
-
 import { render, screen } from "@testing-library/react";
 import { vi } from "vitest";
 import Tile from "./Tile";
@@ -59,13 +40,13 @@ describe("Tile", () => {
 	it('renders with no highlight by default', () => {
 		setup();
 		const tile = screen.getByRole('button');
-		expect(tile).toHaveClass('border-transparent');
+		expect(tile).toHaveAttribute('data-highlighted', 'false');
 	});
 
 	it('renders with highlight when highlighted is true', () => {
 		setup({ highlighted: true });
 		const tile = screen.getByRole('button');
-		expect(tile).not.toHaveClass('border-transparent');
+		expect(tile).toHaveAttribute('data-highlighted', 'true');
 	});
 
 	it('renders with suggested highlight when suggested is true', () => {
@@ -77,13 +58,13 @@ describe("Tile", () => {
 	it('renders with the correct colors when isTurnedOn is true', () => {
 		setup({ isTurnedOn: true });
 		const tile = screen.getByRole('button');
-		expect(tile).toHaveClass('bg-amber-300 text-amber-950');
+		expect(tile).toHaveAttribute('data-lit', 'true');
 	});
 
 	it('renders with the correct colors when isTurnedOn is false', () => {
 		setup({ isTurnedOn: false });
 		const tile = screen.getByRole('button');
-		expect(tile).toHaveClass('bg-stone-700 text-stone-100');
+		expect(tile).toHaveAttribute('data-lit', 'false');
 	});
 
 	// we just want to verify that the motion component recieves some initial
