@@ -1,7 +1,7 @@
 import Tile, { type TileProps } from "@/components/ui/Tile";
 import { generateSolvableBoard } from "@/util/generateSolvableBoard";
 import { solveBoard } from "@/util/solveBoard";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from 'motion/react';
 import { boardKey, BOARD_SIZES, type Difficulty, WIN_SCREEN_DELAY, RESET_GAME_DELAY, STARTING_DIFFICULTY } from "@/constants";
 
@@ -14,6 +14,7 @@ export const GameBoard = ({ motionDisabled = false }: { motionDisabled?: boolean
   const [tiles, setTiles] = useState<TileProps[]>(() => generateSolvableBoard(boardSize));
   const [solutionShown, setSolutionShown] = useState(false);
   const [hasWon, setHasWon] = useState(false);
+  const winTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const changeDifficulty = () => {
     const nextDifficulty: Difficulty =
@@ -115,10 +116,17 @@ export const GameBoard = ({ motionDisabled = false }: { motionDisabled?: boolean
   }
   
   const winGame = () => {
-    setTimeout(() => {
+    if (winTimerRef.current) clearTimeout(winTimerRef.current);
+    winTimerRef.current = setTimeout(() => {
       setHasWon(true);
+      winTimerRef.current = null;
     }, WIN_SCREEN_DELAY);
   }
+
+  // cancel any pending win timer when the component unmounts
+  useEffect(() => () => {
+    if (winTimerRef.current) clearTimeout(winTimerRef.current);
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = hasWon ? 'hidden' : '';
@@ -131,6 +139,10 @@ export const GameBoard = ({ motionDisabled = false }: { motionDisabled?: boolean
   }, [hasWon]);
 
 const resetGame = () => {
+  if (winTimerRef.current) {
+    clearTimeout(winTimerRef.current);
+    winTimerRef.current = null;
+  }
   let newTiles = generateSolvableBoard(boardSize);
   while (previousBoard && (boardKey(newTiles) === boardKey(previousBoard))) {
     newTiles = generateSolvableBoard(boardSize);
@@ -147,6 +159,7 @@ const resetGame = () => {
   // DEBUG: press 'w' to auto win. this could also just be an easter egg for the user
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (hasWon || e.repeat) return;
       if (e.key === 'w' || e.key === 'W') {
         setTiles(prev => prev.map(tile => ({ ...tile, isTurnedOn: false })));
         winGame();
@@ -154,7 +167,7 @@ const resetGame = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [hasWon]);
 
   return (
     <>
@@ -181,7 +194,7 @@ const resetGame = () => {
               </p>
               <button
                 type="button"
-                className="mt-10 rounded-full border border-amber-300/40 px-6 py-3 text-base font-semibold text-stone-950 transition hover:scale-[1.02] hover:bg-amber-300 focus:outline-none"
+                className="mt-10 rounded-full border border-amber-300 bg-amber-300 px-6 py-3 text-base font-semibold text-stone-950 transition hover:scale-[1.02] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-900"
                 onClick={resetGame}
               >
                 Play Again
